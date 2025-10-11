@@ -1,10 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
   <title>Projects – Kalkidan Berhe Gebrekirstos</title>
-  <link rel="stylesheet" href="../style.css?v=8">
+  <link rel="stylesheet" href="../style.css?v=4">
 </head>
 <body>
   <nav>
@@ -12,57 +11,51 @@
     <a href="../projects/index.html" class="current">Projects</a>
     <a href="../contact/index.html">Contact</a>
     <a href="../resume/index.html">Resume</a>
-    <a href="https://github.com/Kalberhe" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://github.com/Kalberhe" target="_blank">GitHub</a>
   </nav>
 
-  <main>
-    <h1>My Projects</h1>
+  <h1>My Projects</h1>
 
-    <section class="projects">
-      <!-- LoL project -->
-      <article class="card">
-        <h3>Predicting League of Legends Match Outcomes</h3>
-        <!-- optional placeholder image for alignment -->
-        <!-- <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt=""> -->
-        <p>
-          Uses pro League of Legends match data to predict outcomes from
-          <strong>early-game statistics</strong> (first tower, first dragon, kills, assists).
-          EDA, hypothesis tests, logistic regression &amp; gradient boosting, plus fairness audits
-          (blue-side bias). Final model &gt;95% accuracy.
-        </p>
-        <div class="links">
-          <a class="btn" href="https://kalberhe.github.io/DSC80_FINAL_PROJECT/" target="_blank" rel="noopener">Project Website</a>
-          <a class="btn" href="https://github.com/Kalberhe/DSC80_FINAL_PROJECT" target="_blank" rel="noopener">GitHub Repo</a>
-        </div>
-      </article>
+  <section class="projects">
+    <!-- League of Legends Project -->
+    <article class="card">
+      <h3>Predicting League of Legends Match Outcomes</h3>
+      <img src="lol.png" alt="League of Legends project preview">
+      <p>
+        Used data from professional League of Legends matches to predict match outcomes 
+        based on <strong>early-game statistics</strong> (like first tower, first dragon, and assists).  
+        Built logistic regression and gradient boosting models with fairness audits.  
+        The final model achieved over 95% accuracy and revealed subtle blue-side bias.  
+      </p>
+      <a href="https://kalberhe.github.io/DSC80_FINAL_PROJECT/" class="btn" target="_blank">View Project</a>
+      <a href="https://github.com/Kalberhe/DSC80_FINAL_PROJECT" class="btn" target="_blank">View Code</a>
+    </article>
 
-      <!-- Sports Betting project -->
-      <article class="card">
-        <h3>Sports Betting Behavior Analysis</h3>
-        <!-- <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt=""> -->
-        <p>
-          Used LiveSports API + Python (pandas, matplotlib, seaborn) to study how real-time odds
-          updates influence bettor actions (EPL/NFL). Ran regressions, A/B tests, and hypothesis tests.
-        </p>
-        <div class="links">
-          <a class="btn" href="https://drive.google.com/file/d/1CTdeA6R5j5pBtOlefa-8UVxA5h-k_CQh/view?usp=sharing"
-             target="_blank" rel="noopener">Report</a>
-        </div>
-      </article>
+    <!-- Sports Betting Project -->
+    <article class="card">
+      <h3>Sports Betting Behavior Analysis</h3>
+      <img src="sportsbetting.png" alt="Sports betting data visualization">
+      <p>
+        Analyzed <strong>real-time betting data</strong> using Python (Pandas, Seaborn) and LiveSports API 
+        to explore how odds fluctuations affected betting patterns in EPL and NFL games.  
+        Conducted regression analysis, A/B testing, and hypothesis testing to identify trends.
+      </p>
+      <a href="https://drive.google.com/file/d/1CTdeA6R5j5pBtOlefa-8UVxA5h-k_CQh/view?usp=sharing" 
+         class="btn" target="_blank">View Report</a>
+    </article>
 
-      <!-- Medical Bill App -->
-      <article class="card">
-        <h3>Medical Bill Decoder (iOS)</h3>
-        <!-- <img src="https://vis-society.github.io/labs/2/images/empty.svg" alt=""> -->
-        <p>
-          Swift + simple NLP to parse medical bills and explain charges in plain language.
-          Added personalized cost estimation features.
-        </p>
-        <div class="links">
-          <a class="btn" href="#" aria-disabled="true">Demo coming soon</a>
-        </div>
-      </article>
-    </section>
-  </main>
+    <!-- Medical Bill App -->
+    <article class="card">
+      <h3>Medical Bill Decoder App</h3>
+      <img src="Medicalbill.png" alt="Medical bill decoding app screenshot">
+      <p>
+        Created an iOS app using <strong>Swift, Python (NLP), and Xcode</strong> 
+        to translate complex medical bills into plain English.  
+        Implemented cost estimation and breakdown visualization to improve transparency 
+        for patients navigating healthcare billing.
+      </p>
+    </article>
+  </section>
 </body>
 </html>
+
