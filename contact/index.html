@@ -1,41 +1,50 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Contact – Kalkidan Berhe Gebrekirstos</title>
-  <link rel="stylesheet" href="../style.css?v=3">
-
-
+  <link rel="stylesheet" href="../style.css?v=4">
 </head>
 <body>
-  <nav>
-    <a href="../index.html">Home</a>
-    <a href="../projects/index.html">Projects</a>
-    <a href="../contact/index.html">Contact</a>
-    <a href="../resume/index.html">Resume</a>
-    <a href="https://github.com/Kalberhe" target="_blank">GitHub</a>
-  </nav>
+  <header>
+    <h1>Contact</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../projects/index.html">Projects</a>
+      <a href="../contact/index.html" class="current">Contact</a>
+      <a href="../resume/index.html">Resume</a>
+      <a href="https://github.com/Kalberhe" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
 
-  <h1>Contact Me</h1>
-  <p>If you’d like to get in touch, fill out the form below:</p>
+  <main>
+    <p class="muted" style="margin-top:.25rem">
+      I’m open to data science internships, collaborations, and analytics projects. Use the form below to reach me.
+    </p>
 
-  <form action="mailto:kgebrekirstos@ucsd.edu" method="POST" enctype="text/plain">
-    <label>
-      Your Email:
-      <input type="email" name="email" required>
-    </label>
-    <br>
-    <label>
-      Subject:
-      <input type="text" name="subject">
-    </label>
-    <br>
-    <label>
-      Message:
-      <textarea name="body"></textarea>
-    </label>
-    <br>
-    <button type="submit">Send</button>
-  </form>
+    <!-- Contact form (keeps mailto:) -->
+    <form class="contact" action="mailto:kgebrekirstos@ucsd.edu" method="POST" enctype="text/plain" novalidate>
+      <label for="name">Name</label>
+      <input id="name" name="name" type="text" autocomplete="name" placeholder="Your full name" required>
+
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="you@example.com" required>
+
+      <label for="subject">Subject</label>
+      <input id="subject" name="subject" type="text" placeholder="What’s this about?" required>
+
+      <label for="body">Message</label>
+      <textarea id="body" name="body" rows="6" placeholder="Tell me a bit about your request…" required></textarea>
+
+      <!-- Submit -->
+      <span></span>
+      <button type="submit">Send</button>
+
+      <!-- Inline feedback area (optional for later JS) -->
+      <span></span>
+      <div class="form-note" aria-live="polite"></div>
+    </form>
+  </main>
 </body>
 </html>
