@@ -95,13 +95,10 @@ nav a.current{
 }
 .btn:hover{ background:#eef4ff; color: var(--accent-dk); }
 
-/* === Contact form (inline layout) === */
-/* Only applies to forms with class="contact" so other forms aren't affected */
-input, textarea, button, select, label { font: inherit; }
-
+/* Contact form: inline grid (labels left, inputs right) */
 form.contact{
   display: grid;
-  grid-template-columns: max-content 1fr; /* label then wide field */
+  grid-template-columns: max-content 1fr; /* label fits text, field takes the rest */
   column-gap: .75rem;
   row-gap: 1rem;
   align-items: center;
@@ -110,8 +107,8 @@ form.contact{
 
 form.contact label{
   grid-column: 1;
-  justify-self: end;
-  white-space: nowrap;          /* keep label on one line */
+  justify-self: end;       /* right-align labels like the mock */
+  white-space: nowrap;     /* keep "Email:" on one line */
   padding-right: .25rem;
 }
 
@@ -126,13 +123,13 @@ form.contact select{
   background: var(--card);
 }
 
-/* Button same width as fields (right column) */
+/* Button same width as fields (right column only) */
 form.contact button{
-  grid-column: 2;
-  justify-self: stretch;        /* fill the input column width */
+  grid-column: 2;          /* stay in inputs column */
+  justify-self: stretch;   /* fill that column’s width */
   text-align: center;
   padding: .8rem 1rem;
-  background: #e9ecef;         /* gray bar like your sample */
+  background: #e9ecef;     /* gray bar like the sample */
   color: #000;
   border: 1px solid var(--line);
   border-radius: .6rem;
@@ -140,7 +137,7 @@ form.contact button{
 }
 form.contact button:hover{ background:#dfe5ea; }
 
-/* Focus & validation */
+/* Focus + validity (keeps your site style) */
 form.contact input:focus,
 form.contact textarea:focus{
   outline: 2px solid color-mix(in oklab, var(--accent) 35%, white);
@@ -158,6 +155,7 @@ form.contact textarea:invalid{ border-color:#cc3b3b; }
   form.contact select,
   form.contact button{ grid-column: 1; }
 }
+
 
 /* === Projects grid (shared) === */
 .projects{
