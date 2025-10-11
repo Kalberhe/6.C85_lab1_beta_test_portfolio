@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Contact – Kalkidan Berhe Gebrekirstos</title>
-  <link rel="stylesheet" href="../style.css?v=5">
+  <link rel="stylesheet" href="../style.css?v=7">
 </head>
 <body>
   <nav>
@@ -15,22 +15,23 @@
     <a href="https://github.com/Kalberhe" target="_blank" rel="noopener">GitHub</a>
   </nav>
 
-  <h1>Contact me</h1>
-  <p>If you’d like to get in touch, fill out the form below:</p>
+  <main>
+    <h1>Contact me</h1>
+    <p class="muted">If you’d like to get in touch, fill out the form below:</p>
 
-  <form class="contact" action="mailto:kgebrekirstos@ucsd.edu" method="POST" enctype="text/plain" novalidate>
-    <label for="email">Email:</label>
-    <input id="email" name="email" type="email" required placeholder="you@example.com" autocomplete="email">
+    <!-- Inline two-column layout; button matches the field width -->
+    <form class="contact" action="mailto:kgebrekirstos@ucsd.edu" method="POST" enctype="text/plain" novalidate>
+      <label for="email">Email:</label>
+      <input id="email" name="email" type="email" required placeholder="you@example.com" autocomplete="email">
 
-    <label for="subject">Subject:</label>
-    <input id="subject" name="subject" type="text" required placeholder="Hello">
+      <label for="subject">Subject:</label>
+      <input id="subject" name="subject" type="text" required placeholder="Hello">
 
-    <label for="body">Message:</label>
-    <textarea id="body" name="body" rows="6" required placeholder="Sup?"></textarea>
+      <label for="body">Message:</label>
+      <textarea id="body" name="body" rows="4" required placeholder="Sup?"></textarea>
 
-    <button type="submit" class="full">Send</button>
-
-    <div class="form-note" aria-live="polite"></div>
-  </form>
+      <button type="submit">Send</button>
+    </form>
+  </main>
 </body>
 </html>
