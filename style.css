@@ -22,19 +22,9 @@ body{
   padding-block: 1.5rem;
 }
 
-header{
-  text-align: center;
-  margin-bottom: 2rem;
-}
-header h1{
-  font-size: 2.5rem;
-  color: var(--accent);
-  margin-bottom: .3rem;
-}
-header p{
-  font-size: 1.1rem;
-  color: var(--muted);
-}
+header{ text-align: center; margin-bottom: 2rem; }
+header h1{ font-size: 2.5rem; color: var(--accent); margin-bottom: .3rem; }
+header p{ font-size: 1.1rem; color: var(--muted); }
 
 nav{
   margin-top: 1rem;
@@ -52,7 +42,6 @@ nav a{
   padding: .5rem .25rem;
   transition: border-color .2s ease, background-color .2s ease, color .2s ease;
   border-bottom: .35rem solid transparent; 
-}
 nav a:hover{
   color: var(--accent-dk);
   border-bottom-color: var(--accent);
@@ -62,10 +51,7 @@ nav a.current{
   color: var(--ink);
   border-bottom-color: var(--accent);
 }
-
-@media (max-width: 600px){
-  nav{ flex-direction: column; }
-}
+@media (max-width: 600px){ nav{ flex-direction: column; } }
 
 main{ margin-top: 2rem; }
 h2{
@@ -85,18 +71,13 @@ img{
   box-shadow: 0 4px 10px rgba(0,0,0,.1);
 }
 
-footer{
-  margin-top: 2rem;
-  text-align: center;
-  font-size: .9rem;
-  color: #666;
-}
+footer{ margin-top: 2rem; text-align: center; font-size: .9rem; color: #666; }
 
 input, textarea, button, select, label { font: inherit; }
 form.contact{
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: .75rem 1rem;   
+  grid-template-columns: 8ch 1fr;   
+  gap: 1rem 1rem;                   
   align-items: start;
   margin-block: 1rem 2rem;
 }
@@ -106,7 +87,7 @@ form.contact textarea,
 form.contact select{
   grid-column: 2;
   width: 100%;
-  padding: .55rem .6rem;
+  padding: .65rem .75rem;           
   border: 1px solid var(--line);
   border-radius: .5rem;
   background: var(--card);
@@ -123,13 +104,36 @@ form.contact button{
 }
 form.contact button:hover{ background: var(--accent-dk); }
 
+form.contact button.full{
+  grid-column: 1 / -1;              
+  justify-self: stretch;
+  text-align: center;
+  padding: .8rem 1rem;
+  background: #e9ecef;
+  color: #000;
+  border: 1px solid var(--line);
+}
+form.contact button.full:hover{ background:#dfe5ea; }
+
+form.contact input:focus,
+form.contact textarea:focus {
+  outline: 2px solid color-mix(in oklab, var(--accent) 35%, white);
+  outline-offset: 2px;
+}
+form.contact input:invalid,
+form.contact textarea:invalid { border-color: #cc3b3b; }
+
+.form-note { color: var(--muted); font-size: .95rem; }
+.muted { color: var(--muted); font-size: .95rem; }
+
 @media (max-width: 600px){
   form.contact{ grid-template-columns: 1fr; }
-  form.contact label{ grid-column: 1; }
+  form.contact label,
   form.contact input,
   form.contact textarea,
   form.contact select,
-  form.contact button{ grid-column: 1; }
+  form.contact button,
+  .form-note{ grid-column: 1; }
 }
 
 .projects{
@@ -139,7 +143,7 @@ form.contact button:hover{ background: var(--accent-dk); }
   margin-block: 1rem 2rem;
 }
 .card{
-  display: grid; 
+  display: grid;
   grid-template-rows: auto 1fr auto;
   gap: .5rem;
   padding: 1rem;
@@ -147,8 +151,10 @@ form.contact button:hover{ background: var(--accent-dk); }
   border: 1px solid var(--line);
   border-radius: .75rem;
 }
-.card h3{ font-size: 1.1rem; }
-.card p{ color: var(--muted); }
+.card h3{ font-size: 1.1rem; min-height: 2.4rem; }
+.card p{ color: var(--muted); margin-bottom: .25rem; }
+.card .links{ display: flex; gap: .5rem; flex-wrap: wrap; }
+
 .card .btn{
   justify-self: start;
   text-decoration: none;
@@ -178,18 +184,5 @@ a.download{
   color: var(--accent);
   text-decoration: none;
 }
-a.download:hover{
-  background: #eef4ff;
-  color: var(--accent-dk);
+a.download:hover{ background: #eef4ff; color: var(--accent-dk); }
 }
-.muted { color: var(--muted); font-size: .95rem; }
-
-form.contact input:focus,
-form.contact textarea:focus {
-  outline: 2px solid color-mix(in oklab, var(--accent) 35%, white);
-  outline-offset: 2px;
-}
-.form-note { color: var(--muted); font-size: .95rem; }
-form.contact input:invalid,
-form.contact textarea:invalid { border-color: #cc3b3b; }
-
