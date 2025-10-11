@@ -1,93 +1,199 @@
-/* Global reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* === Reset & tokens === */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root{
+  --accent: #0056b3;
+  --accent-dk: #003d80;
+  --ink: #222;
+  --muted: #444;
+  --line: #e9e9e9;
+  --card: #ffffff;
 }
 
-/* Base body style */
-body {
+/* === Base === */
+html{ color-scheme: light; }
+body{
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: #fafafa;
-  color: #222;
+  color: var(--ink);
   line-height: 1.6;
-  max-width: 900px;
-  margin: auto;
-  padding: 1.5rem;
+
+  /* Step 1: comfy readable width using ch + fluid side gutters */
+  max-width: 100ch;
+  margin-inline: max(1rem, (100% - 100ch)/2);
+  padding-inline: 1.5rem;
+  padding-block: 1.5rem;
 }
 
-/* Header */
-header {
+/* === Header === */
+header{
   text-align: center;
   margin-bottom: 2rem;
 }
-
-header h1 {
+header h1{
   font-size: 2.5rem;
-  color: #0056b3;
-  margin-bottom: 0.3rem;
+  color: var(--accent);
+  margin-bottom: .3rem;
+}
+header p{
+  font-size: 1.1rem;
+  color: var(--muted);
 }
 
-header p {
-  font-size: 1.2rem;
-  color: #444;
-}
-
-/* Navigation */
-nav {
+/* === Navigation (Step 2) === */
+nav{
   margin-top: 1rem;
+  display: flex;
+  gap: .5rem;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: .25rem;
 }
-
-nav a {
+nav a{
+  flex: 1;
+  text-align: center;
   text-decoration: none;
-  margin: 0 0.8rem;
   font-weight: 500;
-  color: #0056b3;
-  transition: color 0.2s ease;
+  color: var(--accent);
+  padding: .5rem .25rem;
+  transition: border-color .2s ease, background-color .2s ease, color .2s ease;
+  border-bottom: .35rem solid transparent; /* space reserved so no layout shift */
+}
+nav a:hover{
+  color: var(--accent-dk);
+  border-bottom-color: var(--accent);
+  background-color: #eef4ff;
+}
+/* mark the current page with a thick underline */
+nav a.current{
+  color: var(--ink);
+  border-bottom-color: var(--accent);
 }
 
-nav a:hover {
-  color: #003d80;
-  border-bottom: 2px solid #0056b3;
-  padding-bottom: 2px;
+/* Mobile nav stack */
+@media (max-width: 600px){
+  nav{ flex-direction: column; }
 }
 
-/* Main content */
-main {
-  margin-top: 2rem;
-}
-
-h2 {
+/* === Main content === */
+main{ margin-top: 2rem; }
+h2{
   font-size: 1.6rem;
-  margin-bottom: 0.5rem;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 0.3rem;
+  margin-bottom: .5rem;
+  border-bottom: 2px solid var(--line);
+  padding-bottom: .3rem;
   color: #333;
 }
 
-/* About image */
-img {
+/* Images */
+img{
   display: block;
   margin: 2rem auto;
   border-radius: 10px;
   max-width: 100%;
   height: auto;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,.1);
 }
 
-/* Footer (optional) */
-footer {
+/* Footer */
+footer{
   margin-top: 2rem;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: .9rem;
   color: #666;
 }
 
-/* Responsive nav for mobile */
-@media (max-width: 600px) {
-  nav {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+/* === Step 3: Contact form grid === */
+input, textarea, button, select, label { font: inherit; }
+form.contact{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .75rem 1rem;   /* row col */
+  align-items: start;
+  margin-block: 1rem 2rem;
+}
+form.contact label{ grid-column: 1; }
+form.contact input,
+form.contact textarea,
+form.contact select{
+  grid-column: 2;
+  width: 100%;
+  padding: .55rem .6rem;
+  border: 1px solid var(--line);
+  border-radius: .5rem;
+  background: var(--card);
+}
+form.contact button{
+  grid-column: 2;
+  justify-self: start;
+  padding: .55rem .9rem;
+  border-radius: .6rem;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+}
+form.contact button:hover{ background: var(--accent-dk); }
+
+/* Small screens: single column form */
+@media (max-width: 600px){
+  form.contact{ grid-template-columns: 1fr; }
+  form.contact label{ grid-column: 1; }
+  form.contact input,
+  form.contact textarea,
+  form.contact select,
+  form.contact button{ grid-column: 1; }
+}
+
+/* === Step 4: Projects grid === */
+.projects{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+  margin-block: 1rem 2rem;
+}
+.card{
+  display: grid; /* allow internal alignment */
+  grid-template-rows: auto 1fr auto;
+  gap: .5rem;
+  padding: 1rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: .75rem;
+}
+.card h3{ font-size: 1.1rem; }
+.card p{ color: var(--muted); }
+.card .btn{
+  justify-self: start;
+  text-decoration: none;
+  border: 1px solid currentColor;
+  padding: .4rem .7rem;
+  border-radius: .5rem;
+  color: var(--accent);
+}
+.card .btn:hover{
+  background: #eef4ff;
+  color: var(--accent-dk);
+}
+
+/* === Step 5: CV page bits === */
+.cv header h1{ margin-bottom: 0; }
+.cv header p{ margin-top: .25rem; color: #555; }
+.cv .section{
+  margin-block: 1rem;
+  border-top: 1px solid var(--line);
+  padding-top: .75rem;
+}
+/* nice download link */
+a.download{
+  display: inline-block;
+  margin-top: .5rem;
+  padding: .45rem .8rem;
+  border: 1px solid var(--accent);
+  border-radius: .5rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+a.download:hover{
+  background: #eef4ff;
+  color: var(--accent-dk);
 }
