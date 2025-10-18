@@ -202,4 +202,18 @@ a.download:hover{ background:#eef4ff; color: var(--accent-dk); }
   border-radius: 0.5rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
+/* Tell the browser we support both */
+html { color-scheme: light dark; }
+
+/* Use a border var so we can adjust for dark mode */
+nav {
+  --border-color: oklch(50% 10% 200 / 40%); /* subtler on dark */
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Optional: better hover bg in dark mode */
+nav a:hover{
+  background-color: color-mix(in oklch, var(--accent), canvas 85%);
+}
+
 

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <script type="module" src="../global.js"></script>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Contact – Kalkidan Berhe Gebrekirstos</title>
@@ -20,18 +21,19 @@
     <p class="muted">If you’d like to get in touch, fill out the form below:</p>
 
     <!-- Inline two-column layout; button matches the field width -->
-    <form class="contact" action="mailto:kgebrekirstos@ucsd.edu" method="POST" enctype="text/plain" novalidate>
-      <label for="email">Email:</label>
-      <input id="email" name="email" type="email" required placeholder="you@example.com" autocomplete="email">
+    <form class="contact" action="mailto:kgebrekirstos@ucsd.edu" method="POST" enctype="text/plain">
+  <label for="email">Email:</label>
+  <input id="email" name="email" type="email" required placeholder="you@example.com" autocomplete="email">
 
-      <label for="subject">Subject:</label>
-      <input id="subject" name="subject" type="text" required placeholder="Hello">
+  <label for="subject">Subject:</label>
+  <input id="subject" name="subject" type="text" required placeholder="Hello">
 
-      <label for="body">Message:</label>
-      <textarea id="body" name="body" rows="4" required placeholder="Sup?"></textarea>
+  <label for="body">Message:</label>
+  <textarea id="body" name="body" rows="4" required placeholder="Sup?"></textarea>
 
-      <button type="submit">Send</button>
-    </form>
+  <button type="submit">Send</button>
+</form>
+
   </main>
 </body>
 </html>
