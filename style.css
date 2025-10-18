@@ -251,5 +251,16 @@ nav a:hover{
 
 html { color-scheme: light dark; }
 body{ background: var(--bg); color: var(--ink); }
+:root{
+  --bg:#fafafa; --ink:#222; --muted:#444; --line:#e9e9e9; --card:#fff;
+  --accent:#0056b3; --accent-dk:#003d80;
+}
+:root[data-theme="dark"]{
+  --bg:#0e0f10; --ink:#e7e7e7; --muted:#b7b7b7; --line:#2a2e33; --card:#131417;
+  --accent:#76a7ff; --accent-dk:#5a86d1;
+}
+html{ color-scheme: light dark; }
+body{ background: var(--bg); color: var(--ink); }
+
 
 
