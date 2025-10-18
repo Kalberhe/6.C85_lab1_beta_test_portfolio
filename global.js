@@ -1,118 +1,82 @@
-// global.js  — load with: <script type="module" src="../global.js"></script>
+// global.js — load on every page with type="module"
+console.log("IT’S ALIVE!");
 
-/* ---------- Config ---------- */
-const REPO = "6.C85_lab1_beta_test_portfolio"; // your GitHub Pages repo name
-const PAGES = [
-  { url: "",            title: "Home" },
-  { url: "projects/",   title: "Projects" },
-  { url: "contact/",    title: "Contact" },
-  { url: "resume/",     title: "Resume" },
-  { url: "https://github.com/Kalberhe", title: "GitHub" }, // external
+// repo base (works locally + on GitHub Pages)
+const REPO = "6.C85_lab1_beta_test_portfolio";
+const IS_LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
+const BASE = IS_LOCAL ? "/" : `/${REPO}/`;
+
+// pages to show in the nav
+const pages = [
+  { url: "",          title: "Home" },
+  { url: "projects/", title: "Projects" },
+  { url: "contact/",  title: "Contact" },
+  { url: "resume/",   title: "Resume" },
+  { url: "https://github.com/Kalberhe", title: "GitHub" },
 ];
 
-/* ---------- Helpers ---------- */
-const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
-const BASE = isLocal ? "/" : `/${REPO}/`;
+// build nav
+const nav = document.createElement("nav");
+document.body.prepend(nav);
 
-const normPath = p =>
-  p.replace(/\/index\.html$/, "/").replace(/\/+$/, "/"); // normalize trailing slash
+for (const p of pages) {
+  const href = p.url.startsWith("http") ? p.url : BASE + p.url;
+  const a = document.createElement("a");
+  a.href = href;
+  a.textContent = p.title;
 
-const makeHref = url => (url.startsWith("http") ? url : BASE + url);
+  // external links open in new tab
+  if (a.host !== location.host) { a.target = "_blank"; a.rel = "noopener"; }
 
-/* ---------- NAV: build or reuse ---------- */
-function buildNav() {
-  // Reuse existing <nav>, or create one
-  let nav = document.querySelector("nav");
-  if (!nav) {
-    nav = document.createElement("nav");
-    // Put nav at top of body, but after any theme toggle label we inject later
-    document.body.prepend(nav);
-  } else {
-    // Clear any hard-coded links so we don't get duplicate rows/styles
-    nav.innerHTML = "";
-  }
+  // mark current page (normalize trailing slash)
+  const linkPath = new URL(a.href).pathname.replace(/\/+$/, "");
+  const herePath = location.pathname.replace(/\/+$/, "");
+  if (a.host === location.host && linkPath === herePath) a.classList.add("current");
 
-  // Build links
-  for (const p of PAGES) {
-    const a = document.createElement("a");
-    a.href = makeHref(p.url);
-    a.textContent = p.title;
-
-    // External links open new tab
-    if (a.host !== location.host) {
-      a.target = "_blank";
-      a.rel = "noopener";
-    }
-
-    // Current page highlight (only for same-host links)
-    const sameHost = a.host === location.host;
-    if (sameHost) {
-      const isCurrent = normPath(a.pathname) === normPath(location.pathname);
-      if (isCurrent) a.classList.add("current");
-    }
-
-    nav.append(a);
-  }
+  nav.append(a);
 }
 
-/* ---------- THEME: Auto / Light / Dark ---------- */
-// We drive site colors via CSS vars in :root[data-theme="..."]
-// Also set color-scheme so native controls match.
+// ---- Theme switcher (Auto / Light / Dark) ----
+document.body.insertAdjacentHTML("afterbegin", `
+  <label style="position:absolute;top:1rem;right:1rem;font-size:.9rem">
+    Theme:
+    <select id="theme">
+      <option value="auto">Automatic</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </label>
+`);
+
+const select = document.querySelector("#theme");
+
+function osPrefersDark() {
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+
 function applyTheme(mode) {
-  // mode: "auto" | "light" | "dark"
-  const doc = document.documentElement;
-
-  // color-scheme affects form controls, scrollbars, etc.
-  const cs = mode === "auto" ? "light dark" : mode;
-  doc.style.setProperty("color-scheme", cs);
-
-  if (mode === "auto") {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    doc.setAttribute("data-theme", prefersDark ? "dark" : "light");
-  } else {
-    doc.setAttribute("data-theme", mode);
-  }
+  const html = document.documentElement;
+  html.setAttribute("data-theme", mode);            // our CSS vars
+  html.style.colorScheme = mode === "auto"
+    ? (osPrefersDark() ? "dark" : "light")
+    : mode;                                         // built-in UI
 }
 
-function initThemeUI() {
-  // Insert a compact select at top-right if not already present
-  if (!document.querySelector("#theme")) {
-    document.body.insertAdjacentHTML(
-      "afterbegin",
-      `
-      <label class="color-scheme" style="position:absolute;top:1rem;right:1rem;font-size:80%">
-        Theme:
-        <select id="theme">
-          <option value="auto">Automatic</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </label>
-      `
-    );
-  }
+// init from storage (default: auto)
+const saved = localStorage.getItem("colorScheme") || "auto";
+select.value = saved; applyTheme(saved);
 
-  const select = document.querySelector("#theme");
+// persist & apply on change
+select.addEventListener("input", e => {
+  const mode = e.target.value;                      // auto|light|dark
+  localStorage.setItem("colorScheme", mode);
+  applyTheme(mode);
+});
 
-  // Initialize from storage or default to auto
-  const saved = localStorage.getItem("theme") || "auto";
-  select.value = saved;
-  applyTheme(saved);
-
-  // Update on change
-  select.addEventListener("input", e => {
-    const mode = e.target.value; // "auto" | "light" | "dark"
-    localStorage.setItem("theme", mode);
-    applyTheme(mode);
-  });
-
-  // If user is in auto, follow system changes live
-  const mql = window.matchMedia("(prefers-color-scheme: dark)");
-  mql.addEventListener("change", () => {
-    if ((localStorage.getItem("theme") || "auto") === "auto") applyTheme("auto");
+// update if OS theme changes while in Auto
+if (window.matchMedia) {
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  mq.addEventListener?.("change", () => {
+    if (localStorage.getItem("colorScheme") === "auto") applyTheme("auto");
   });
 }
-
-/* ---------- Init ---------- */
-buildNav();
-initThemeUI();
