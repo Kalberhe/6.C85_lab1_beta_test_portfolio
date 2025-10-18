@@ -28,13 +28,26 @@ body{
 
 main { margin-top: 2rem; }
 
-h1{ font-size: 2.2rem; margin-bottom: .5rem; color: var(--ink); }
+h1{
+  font-size: 2.2rem;
+  margin-bottom: .5rem;
+  color: var(--ink);
+}
+
 h2{
   font-size: 1.6rem;
   margin-bottom: .5rem;
   border-bottom: 2px solid var(--line);
   padding-bottom: .3rem;
-  color: #333;
+  color: var(--heading);
+}
+
+/* Theme-adaptive heading color */
+:root[data-theme="light"] {
+  --heading: #2e2e2e; /* dark gray on light */
+}
+:root[data-theme="dark"] {
+  --heading: #c7c7c7; /* soft gray on dark */
 }
 
 p{ margin-block: .4rem .8rem; }
@@ -155,6 +168,7 @@ form.contact textarea:invalid{ border-color:#cc3b3b; }
   form.contact select,
   form.contact button{ grid-column: 1; }
 }
+
 /* === Projects grid (shared) === */
 .projects{
   display: grid;
@@ -202,21 +216,23 @@ a.download:hover{ background:#eef4ff; color: var(--accent-dk); }
   border-radius: 0.5rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
-/* Tell the browser we support both */
+
+/* === Theme & dark mode support === */
 html { color-scheme: light dark; }
 
-/* Use a border var so we can adjust for dark mode */
+/* Border adjusts for dark */
 nav {
-  --border-color: oklch(50% 10% 200 / 40%); /* subtler on dark */
+  --border-color: oklch(50% 10% 200 / 40%);
   border-bottom: 1px solid var(--border-color);
 }
 
-/* Optional: better hover bg in dark mode */
+/* Hover color adapts */
 nav a:hover{
   background-color: color-mix(in oklch, var(--accent), canvas 85%);
 }
-:root{
-  /* light */
+
+/* Light and dark variables */
+:root {
   --bg: #fafafa;
   --ink: #222;
   --muted: #444;
@@ -226,7 +242,7 @@ nav a:hover{
   --accent-dk: #003d80;
 }
 
-:root[data-theme="dark"]{
+:root[data-theme="dark"] {
   --bg: #0e0f10;
   --ink: #e7e7e7;
   --muted: #b7b7b7;
@@ -236,9 +252,9 @@ nav a:hover{
   --accent-dk: #5a86d1;
 }
 
-/* honor OS when in auto */
-@media (prefers-color-scheme: dark){
-  :root[data-theme="auto"]{
+/* Auto respects OS */
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
     --bg: #0e0f10;
     --ink: #e7e7e7;
     --muted: #b7b7b7;
@@ -249,18 +265,7 @@ nav a:hover{
   }
 }
 
-html { color-scheme: light dark; }
-body{ background: var(--bg); color: var(--ink); }
-:root{
-  --bg:#fafafa; --ink:#222; --muted:#444; --line:#e9e9e9; --card:#fff;
-  --accent:#0056b3; --accent-dk:#003d80;
+body {
+  background: var(--bg);
+  color: var(--ink);
 }
-:root[data-theme="dark"]{
-  --bg:#0e0f10; --ink:#e7e7e7; --muted:#b7b7b7; --line:#2a2e33; --card:#131417;
-  --accent:#76a7ff; --accent-dk:#5a86d1;
-}
-html{ color-scheme: light dark; }
-body{ background: var(--bg); color: var(--ink); }
-
-
-
