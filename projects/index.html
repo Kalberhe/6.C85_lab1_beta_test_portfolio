@@ -8,6 +8,29 @@
   <script type="module" src="../global.js"></script>
 </head>
 <body>
+  
+  <!-- projects/index.html -->
+<section class="projects-wrap">
+  <!-- Search (Step 4.1) -->
+  <input
+    class="searchBar"
+    type="search"
+    aria-label="Search projects"
+    placeholder="🔍 Search projects…"
+  />
+
+  <!-- Pie + Legend container (Step 2.3) -->
+  <div class="pie-flex">
+    <svg id="projects-pie-plot" viewBox="-50 -50 100 100" aria-label="Projects per year"></svg>
+    <ul class="legend" aria-label="Year legend"></ul>
+  </div>
+
+  <!-- Your existing projects list container -->
+  <div class="projects"></div>
+</section>
+
+<script type="module" src="./projects.js"></script>
+
 
   <!-- give the H1 a class so we can update the count -->
   <h1 class="projects-title">My Projects</h1>

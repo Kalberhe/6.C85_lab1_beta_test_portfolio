@@ -1,7 +1,7 @@
 [
   {
     "title": "Predicting League of Legends Match Outcomes",
-    "year": "2025",
+    "year": "2024",
     "image": "lol.png",
     "description": "Logistic regression and gradient boosting on pro match data; early-game features; fairness audit; >95% accuracy; slight blue-side bias.",
     "links": [
@@ -11,7 +11,7 @@
   },
   {
     "title": "Sports Betting Behavior Analysis",
-    "year": "2025",
+    "year": "2024",
     "image": "sportsbetting.png",
     "description": "Explored odds fluctuations vs. betting patterns (EPL, NFL) with regression, A/B tests, hypothesis testing.",
     "links": [
@@ -20,9 +20,8 @@
   },
   {
     "title": "Medical Bill Decoder App",
-    "year": "2025",
+    "year": "2024",
     "image": "Medicalbill.png",
     "description": "Swift + NLP app translating medical bills and estimating costs with breakdown visualizations."
   }
 ]
-
