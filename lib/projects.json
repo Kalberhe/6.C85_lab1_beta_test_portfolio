@@ -11,7 +11,7 @@
   },
   {
     "title": "Sports Betting Behavior Analysis",
-    "year": "2024",
+    "year": "2023",
     "image": "sportsbetting.png",
     "description": "Explored odds fluctuations vs. betting patterns (EPL, NFL) with regression, A/B tests, hypothesis testing.",
     "links": [
@@ -20,7 +20,7 @@
   },
   {
     "title": "Medical Bill Decoder App",
-    "year": "2024",
+    "year": "2022",
     "image": "Medicalbill.png",
     "description": "Swift + NLP app translating medical bills and estimating costs with breakdown visualizations."
   }

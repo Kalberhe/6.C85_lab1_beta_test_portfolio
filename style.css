@@ -310,8 +310,9 @@ body {
 .legend li em { opacity: .7; font-style: normal; }
 
 /* Hover highlight (Step 5.1) */
-#projects-pie-plot:has(path:hover) path:not(:hover) { opacity: 0.5; }
-#projects-pie-plot path { transition: 300ms; cursor: pointer; }
+#projects-pie-plot:has(path:hover) path:not(:hover){opacity:.45}
+#projects-pie-plot path.hovered{filter:saturate(1.4) brightness(1.1)}
+
 
 /* Selected state (Step 5.2) */
 .selected {
