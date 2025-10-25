@@ -3,44 +3,43 @@
 <head>
   <meta charset="utf-8">
   <title>Projects – Kalkidan Berhe Gebrekirstos</title>
-  <link rel="stylesheet" href="../style.css?v=4">
-  <!-- load globals as a module -->
+  <link rel="stylesheet" href="../style.css?v=8">
+  <!-- load global utilities -->
   <script type="module" src="../global.js"></script>
 </head>
 <body>
-  
-  <!-- projects/index.html -->
-<section class="projects-wrap">
-  <!-- Search (Step 4.1) -->
-  <input
-    class="searchBar"
-    type="search"
-    aria-label="Search projects"
-    placeholder="🔍 Search projects…"
-  />
+  <nav>
+    <a href="../index.html">Home</a>
+    <a href="../projects/index.html" class="current">Projects</a>
+    <a href="../contact/index.html">Contact</a>
+    <a href="../resume/index.html">Resume</a>
+    <a href="https://github.com/Kalberhe" target="_blank">GitHub</a>
+  </nav>
 
-  <!-- Pie + Legend container (Step 2.3) -->
-  <div class="pie-flex">
-    <svg id="projects-pie-plot" viewBox="-50 -50 100 100" aria-label="Projects per year"></svg>
-    <ul class="legend" aria-label="Year legend"></ul>
-  </div>
+  <main class="projects-wrap">
+    <h1 class="projects-title">My Projects</h1>
 
-  <!-- Your existing projects list container -->
-  <div class="projects"></div>
-</section>
+    <!-- Search (Step 4.1) -->
+    <input
+      class="searchBar"
+      type="search"
+      aria-label="Search projects"
+      placeholder="🔍 Search projects…"
+    />
 
-<script type="module" src="./projects.js"></script>
+    <!-- Pie + Legend container (Step 2.3) -->
+    <div class="pie-flex">
+      <svg id="projects-pie-plot" viewBox="-50 -50 100 100" aria-label="Projects per year"></svg>
+      <ul class="legend" aria-label="Year legend"></ul>
+    </div>
 
+    <!-- JS will fill this section with project cards -->
+    <div class="projects">
+      <noscript>Please enable JavaScript to see projects.</noscript>
+    </div>
+  </main>
 
-  <!-- give the H1 a class so we can update the count -->
-  <h1 class="projects-title">My Projects</h1>
-
-  <!-- JS will replace the contents of this container -->
-  <section class="projects">
-    <noscript>Please enable JavaScript to see projects.</noscript>
-  </section>
-
-  <!-- page script (module so we can import from global.js) -->
-  <script type="module" src="projects.js"></script>
+  <!-- Single, correct script import -->
+  <script type="module" src="./projects.js"></script>
 </body>
 </html>

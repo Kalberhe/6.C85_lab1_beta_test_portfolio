@@ -25,6 +25,11 @@ const projectsContainer = document.querySelector('.projects');
 const searchInput = document.querySelector('.searchBar');
 const titleEl = document.querySelector('.projects-title'); // optional
 
+const mainEl = document.querySelector('main.projects-wrap');
+if (mainEl && titleEl && mainEl.firstElementChild !== titleEl) {
+  mainEl.prepend(titleEl);
+}
+
 // --- Global state (supports extra-credit combined filters) ---
 let allProjects = [];
 let query = '';
