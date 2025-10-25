@@ -134,3 +134,19 @@ export function renderProjects(projects, container, headingLevel = "h2") {
     container.appendChild(article);
   }
 }
+
+export function renderProject(p) {
+  const card = document.createElement("article");
+  card.className = "project";
+
+  card.innerHTML = `
+    <img alt="${p.title}" src="${p.image}">
+    <div class="meta">
+      <h2>${p.title}</h2>
+      <p class="desc">${p.description}</p>
+      <p class="year" aria-label="Project year">${p.year ?? ""}</p>
+    </div>
+  `;
+  return card;
+}
+
