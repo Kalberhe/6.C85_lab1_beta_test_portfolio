@@ -1,18 +1,18 @@
 // index.js
-import { fetchJSON, renderProjects, fetchGitHubData } from "./global.js";
+import { fetchJSON, renderProjects, fetchGitHubData } from "./global.js?v=2";
 
 async function main() {
-  // --- Latest 3 projects on the home page ---
+
   const all = await fetchJSON("./lib/projects.json");
   const latest = (Array.isArray(all) ? all : [])
     .slice(0, 3)
-    // images in JSON are relative to /projects; prefix so they work on home
+
     .map(p => ({ ...p, image: p.image?.startsWith("projects/") ? p.image : `projects/${p.image}` }));
 
   const projContainer = document.querySelector(".projects");
   if (projContainer) renderProjects(latest, projContainer, "h3");
 
-  // --- GitHub stats (username fixed inside fetchGitHubData) ---
+ 
   const stats = await fetchGitHubData();
   const box = document.querySelector("#profile-stats");
   if (box && stats) {
