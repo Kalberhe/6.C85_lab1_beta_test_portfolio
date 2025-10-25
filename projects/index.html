@@ -3,23 +3,24 @@
 <head>
   <meta charset="utf-8">
   <title>Projects – Kalkidan Berhe Gebrekirstos</title>
-  <link rel="stylesheet" href="../style.css?v=8">
-  <!-- load global utilities -->
+  <link rel="stylesheet" href="../style.css?v=9">
+  <!-- global utilities (renders the site navbar) -->
   <script type="module" src="../global.js"></script>
 </head>
 <body>
-  <nav>
-    <a href="../index.html">Home</a>
-    <a href="../projects/index.html" class="current">Projects</a>
-    <a href="../contact/index.html">Contact</a>
-    <a href="../resume/index.html">Resume</a>
-    <a href="https://github.com/Kalberhe" target="_blank">GitHub</a>
-  </nav>
+  <!-- Do NOT add a <nav> here; global.js injects it -->
 
   <main class="projects-wrap">
+    <!-- 1) Title -->
     <h1 class="projects-title">My Projects</h1>
 
-    <!-- Search (Step 4.1) -->
+    <!-- 2) Pie + Legend -->
+    <div class="pie-flex">
+      <svg id="projects-pie-plot" viewBox="-50 -50 100 100" aria-label="Projects per year"></svg>
+      <ul class="legend" aria-label="Year legend"></ul>
+    </div>
+
+    <!-- 3) Search -->
     <input
       class="searchBar"
       type="search"
@@ -27,19 +28,13 @@
       placeholder="🔍 Search projects…"
     />
 
-    <!-- Pie + Legend container (Step 2.3) -->
-    <div class="pie-flex">
-      <svg id="projects-pie-plot" viewBox="-50 -50 100 100" aria-label="Projects per year"></svg>
-      <ul class="legend" aria-label="Year legend"></ul>
-    </div>
-
-    <!-- JS will fill this section with project cards -->
+    <!-- 4) Project cards (filled by JS) -->
     <div class="projects">
       <noscript>Please enable JavaScript to see projects.</noscript>
     </div>
   </main>
 
-  <!-- Single, correct script import -->
+  <!-- Page script -->
   <script type="module" src="./projects.js"></script>
 </body>
 </html>
