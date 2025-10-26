@@ -23,5 +23,59 @@
     "year": "2022",
     "image": "Medicalbill.png",
     "description": "Swift + NLP app translating medical bills and estimating costs with breakdown visualizations."
+  },
+  {
+    "title": "Women’s Basketball Data Dashboard",
+    "year": "2024",
+    "image": "",
+    "description": "Built an interactive dashboard in Python and Plotly for UCSD Women’s Basketball, tracking player performance and lineup efficiency."
+  },
+  {
+    "title": "Padres Business Analytics Case Study",
+    "year": "2024",
+    "image": "",
+    "description": "Analyzed attendance trends, concession sales, and ticket pricing for San Diego Padres to recommend data-driven pricing strategies."
+  },
+  {
+    "title": "Climate Change Storytelling Visualization",
+    "year": "2024",
+    "image": "",
+    "description": "Designed an animated scrollytelling visualization on CO₂ emissions using D3.js and narrative text alignment inspired by climate spirals."
+  },
+  {
+    "title": "Eclipse Sports Analytics Club Website",
+    "year": "2023",
+    "image": "",
+    "description": "Developed the club’s official website featuring team projects, meeting schedules, and embedded Tableau dashboards."
+  },
+  {
+    "title": "Netflix Recommendation System",
+    "year": "2023",
+    "image": "",
+    "description": "Implemented collaborative filtering and content-based models to predict movie ratings using the MovieLens dataset."
+  },
+  {
+    "title": "Stock Trend Prediction Model",
+    "year": "2023",
+    "image": "",
+    "description": "Created an LSTM neural network to predict short-term stock movements; visualized uncertainty with confidence bands."
+  },
+  {
+    "title": "Food Rescue Route Optimization",
+    "year": "2022",
+    "image": "",
+    "description": "Partnered with HDSI Food Recovery Network; optimized driver routes using NetworkX and Google Maps API."
+  },
+  {
+    "title": "Economic Indicators Dashboard",
+    "year": "2022",
+    "image": "",
+    "description": "Built a Tableau dashboard combining GDP, inflation, and unemployment data; implemented dynamic filters for real-time insights."
+  },
+  {
+    "title": "Habesha Cultural Heritage Website",
+    "year": "2021",
+    "image": "",
+    "description": "Developed a bilingual website to preserve Habesha cultural traditions through community stories and visual archives."
   }
 ]

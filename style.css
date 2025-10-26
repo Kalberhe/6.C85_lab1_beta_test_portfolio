@@ -378,4 +378,10 @@ main.projects-wrap {
 .selected { --color: oklch(60% 0.45 0) !important; }
 .selected:is(path) { fill: var(--color); }
 
+.placeholder-img{
+  height:160px; border:1px dashed var(--line, #ccc); border-radius:10px;
+  display:flex; align-items:center; justify-content:center; color:#666;
+  font-size:.9rem; background:#f9f9f9; margin-bottom:.5rem;
+}
+
 
