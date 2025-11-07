@@ -1,22 +1,22 @@
 // global.js — load on every page with type="module"
 console.log("IT’S ALIVE!");
 
+// ---------- Paths (GitHub Pages vs local) ----------
 const REPO = "6.C85_lab1_beta_test_portfolio";
 const IS_LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
 const BASE = IS_LOCAL ? "/" : `/${REPO}/`;
 
-
+// ---------- Nav pages (Meta included) ----------
 const pages = [
   { url: "",          title: "Home" },
   { url: "projects/", title: "Projects" },
   { url: "contact/",  title: "Contact" },
   { url: "resume/",   title: "Resume" },
-  { url: "Meta/",     title: "Meta" }, 
-  { url: "https://github.com/Kalberhe", title: "GitHub" },
+  { url: "Meta/",     title: "Meta" },
+  { url: "https://github.com/Kalberhe", title: "GitHub", external: true },
 ];
 
-
-
+// ---------- Build navbar (no inline styles; let your CSS handle the look) ----------
 const nav = document.createElement("nav");
 document.body.prepend(nav);
 
@@ -26,67 +26,79 @@ for (const p of pages) {
   a.href = href;
   a.textContent = p.title;
 
-  
-  if (a.host !== location.host) { 
-    a.target = "_blank"; 
-    a.rel = "noopener"; 
+  // External links in a new tab
+  if (p.external || new URL(href, location.href).host !== location.host) {
+    a.target = "_blank";
+    a.rel = "noopener";
   }
 
-  
-  const linkPath = new URL(a.href).pathname.replace(/\/+$/, "");
+  // Highlight current page
+  const linkPath = new URL(a.href, location.href).pathname.replace(/\/+$/, "");
   const herePath = location.pathname.replace(/\/+$/, "");
-  if (a.host === location.host && linkPath === herePath) a.classList.add("current");
+  if (a.host === location.host && linkPath === herePath) {
+    a.classList.add("current");
+  }
 
   nav.append(a);
 }
 
-
-document.body.insertAdjacentHTML("afterbegin", `
-  <label style="position:absolute;top:1rem;right:1rem;font-size:.9rem">
-    Theme:
-    <select id="theme">
-      <option value="auto">Automatic</option>
-      <option value="light">Light</option>
-      <option value="dark">Dark</option>
-    </select>
-  </label>
-`);
+// ---------- Theme switcher (id="theme" — matches your CSS/markup expectations) ----------
+document.body.insertAdjacentHTML(
+  "afterbegin",
+  `
+<label style="position:absolute;top:1rem;right:1rem;font-size:.9rem">
+  Theme:
+  <select id="theme">
+    <option value="auto">Automatic</option>
+    <option value="light">Light</option>
+    <option value="dark">Dark</option>
+  </select>
+</label>`
+);
 
 const select = document.querySelector("#theme");
 
-function osPrefersDark() {
-  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-}
-
+// Apply theme using data-theme (your CSS can target [data-theme="dark"] / [data-theme="light"])
+// Automatic removes the attribute so prefers-color-scheme works.
 function applyTheme(mode) {
   const html = document.documentElement;
-  html.setAttribute("data-theme", mode);
-  html.style.colorScheme = mode === "auto"
-    ? (osPrefersDark() ? "dark" : "light")
-    : mode;
+  if (mode === "light") {
+    html.setAttribute("data-theme", "light");
+    html.style.colorScheme = "light";
+  } else if (mode === "dark") {
+    html.setAttribute("data-theme", "dark");
+    html.style.colorScheme = "dark";
+  } else {
+    html.removeAttribute("data-theme"); // Automatic
+    const darkOS = window.matchMedia &&
+                   window.matchMedia("(prefers-color-scheme: dark)").matches;
+    html.style.colorScheme = darkOS ? "dark" : "light";
+  }
 }
 
-
+// Init theme from storage (default: auto)
 const saved = localStorage.getItem("colorScheme") || "auto";
-select.value = saved; 
+select.value = saved;
 applyTheme(saved);
 
-
-select.addEventListener("input", e => {
+// Change handler
+select.addEventListener("input", (e) => {
   const mode = e.target.value;
   localStorage.setItem("colorScheme", mode);
   applyTheme(mode);
 });
 
-
+// If system theme changes and we're in auto, re-apply
 if (window.matchMedia) {
   const mq = window.matchMedia("(prefers-color-scheme: dark)");
   mq.addEventListener?.("change", () => {
-    if (localStorage.getItem("colorScheme") === "auto") applyTheme("auto");
+    if ((localStorage.getItem("colorScheme") || "auto") === "auto") {
+      applyTheme("auto");
+    }
   });
 }
 
-
+// ---------- Optional helpers you already use ----------
 export async function fetchJSON(url) {
   try {
     const res = await fetch(url);
@@ -98,11 +110,9 @@ export async function fetchJSON(url) {
   }
 }
 
-
 export async function fetchGitHubData() {
   return fetchJSON("https://api.github.com/users/Kalberhe");
 }
-
 
 export function renderProjects(projects, container, headingLevel = "h2") {
   if (!container) return;
@@ -117,14 +127,8 @@ export function renderProjects(projects, container, headingLevel = "h2") {
     const article = document.createElement("article");
     article.classList.add("card");
 
-  
     const buttons = Array.isArray(p.links)
-      ? p.links
-          .map(
-            (l) =>
-              `<a class="btn" href="${l.href}" target="_blank" rel="noopener">${l.label}</a>`
-          )
-          .join(" ")
+      ? p.links.map(l => `<a class="btn" href="${l.href}" target="_blank" rel="noopener">${l.label}</a>`).join(" ")
       : "";
 
     article.innerHTML = `
@@ -140,7 +144,6 @@ export function renderProjects(projects, container, headingLevel = "h2") {
 export function renderProject(p) {
   const card = document.createElement("article");
   card.className = "project";
-
   card.innerHTML = `
     <img alt="${p.title}" src="${p.image}">
     <div class="meta">
@@ -151,4 +154,3 @@ export function renderProject(p) {
   `;
   return card;
 }
-
