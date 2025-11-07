@@ -78,3 +78,47 @@
   max-width: 280px;
   z-index: 20;
 }
+/* Chart look (leave as-is if you already added similar rules) */
+#scatter { background: none; }
+
+/* grid + axes */
+.grid line { stroke: #e7ebf0; }
+.axis path, .axis line { stroke: #cfd6df; }
+.axis text { fill: #222; }
+
+html[data-theme="dark"] .grid line { stroke: #2d3238; }
+html[data-theme="dark"] .axis path,
+html[data-theme="dark"] .axis line { stroke: #3a4049; }
+html[data-theme="dark"] .axis text { fill: #e8eaed; }
+
+/* dots: theme blue; selected = red */
+.dots circle {
+  fill: #4f79ff;           /* theme blue */
+  fill-opacity: .9;
+  transition: 150ms transform, 150ms fill-opacity;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.dots circle:hover { transform: scale(1.2); fill-opacity: 1; }
+.dots circle.selected { fill: #ff6b6b; }  /* red when brushed */
+
+/* nice compact stat list */
+.stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .4rem 1rem;
+  margin-top: .5rem;
+}
+.stats dt { opacity:.7; font-variant: all-small-caps; letter-spacing:.03em; }
+.stats dd { margin:0; }
+/* Force red fill for selected dots */
+.dot[fill="#ff6b6b"],
+.dots circle[fill="#ff6b6b"] {
+  fill: #ff6b6b !important;
+}
+
+/* optional: make them pop slightly */
+.dot[fill="#ff6b6b"] {
+  stroke: #000;
+  stroke-width: 1;
+}
