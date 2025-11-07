@@ -62,6 +62,7 @@ const select = document.querySelector("#theme");
 // Automatic removes the attribute so prefers-color-scheme works.
 function applyTheme(mode) {
   const html = document.documentElement;
+
   if (mode === "light") {
     html.setAttribute("data-theme", "light");
     html.style.colorScheme = "light";
@@ -69,29 +70,29 @@ function applyTheme(mode) {
     html.setAttribute("data-theme", "dark");
     html.style.colorScheme = "dark";
   } else {
-    html.removeAttribute("data-theme"); // Automatic
-    const darkOS = window.matchMedia &&
-                   window.matchMedia("(prefers-color-scheme: dark)").matches;
-    html.style.colorScheme = darkOS ? "dark" : "light";
+    // Automatic = match OS
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    html.setAttribute("data-theme", prefersDark ? "dark" : "light");
+    html.style.colorScheme = prefersDark ? "dark" : "light";
   }
 }
 
-// Init theme from storage (default: auto)
+// Initialize theme
 const saved = localStorage.getItem("colorScheme") || "auto";
 select.value = saved;
 applyTheme(saved);
 
-// Change handler
+// On change
 select.addEventListener("input", (e) => {
   const mode = e.target.value;
   localStorage.setItem("colorScheme", mode);
   applyTheme(mode);
 });
 
-// If system theme changes and we're in auto, re-apply
+// Listen to OS changes if set to auto
 if (window.matchMedia) {
   const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  mq.addEventListener?.("change", () => {
+  mq.addEventListener("change", () => {
     if ((localStorage.getItem("colorScheme") || "auto") === "auto") {
       applyTheme("auto");
     }
