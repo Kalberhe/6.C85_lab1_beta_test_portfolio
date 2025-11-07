@@ -1,111 +1,160 @@
-import * as d3mod from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-const d3 = d3mod;
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
-const W = 900, H = 420, M = {t:30,r:30,b:40,l:60};
+/* ---- Sizing ---- */
+const W = 900, H = 420, M = { t:30, r:28, b:44, l:56 };
 const innerW = W - M.l - M.r, innerH = H - M.t - M.b;
 
-const svg = d3.select("#scatter");
+/* ---- SVG ---- */
+const svg = d3.select("#scatter").attr("width", W).attr("height", H);
+
+/* Solid white background INSIDE the SVG so it’s white in all themes */
+svg.insert("rect", ":first-child")
+  .attr("x", 0).attr("y", 0)
+  .attr("width", W).attr("height", H)
+  .attr("fill", "#fff");
+
 const g = svg.append("g").attr("transform", `translate(${M.l},${M.t})`);
 
 const tooltip = d3.select("#tooltip");
-const fmtTime = d3.timeFormat("%b %d, %Y %I:%M %p");
+const fmtInt = d3.format(",");
+const fmtTimeLong = d3.timeFormat("%b %d, %Y %I:%M %p");
 
-d3.csv("loc.csv", d3.autoType).then(raw => {
-  // expected columns (from elocuent --git):
-  // commit, author, date, path, language, added, deleted, total
-  // If your columns differ, tell me and I’ll adapt the parsing.
+/* ---- Load CSV ---- */
+const raw = await d3.csv("./loc.csv", d3.autoType);
 
-  // --- preprocess ---
-  const data = raw.map(d => {
-    const when = new Date(d.date);
+/* One dot per commit */
+const commits = d3.rollups(
+  raw,
+  v => {
+    const head = v[0];
+    const when = head.datetime instanceof Date
+      ? head.datetime
+      : new Date(`${head.date}T${head.time}${head.timezone ?? ""}`);
+
     return {
-      ...d,
+      commit: head.commit,
+      author: head.author,
       when,
       hour: when.getHours() + when.getMinutes()/60,
-      totalLines: (d.total ?? (d.added || 0) + (d.deleted || 0))
+      linesTouched: v.length,
+      filesTouched: new Set(v.map(d => d.file)).size,
+      longestLine: d3.max(v, d => +d.length || 0),
+      sampleFile: head.file
     };
-  });
+  },
+  d => d.commit
+).map(d => d[1]).sort((a,b)=>d3.ascending(a.when,b.when));
 
-  // --- summary stats (Step 1) ---
-  const totalCommits = data.length;
-  const totalLines = d3.sum(data, d => d.totalLines);
-  const uniqueFiles = new Set(data.map(d => d.path)).size;
+/* ---- Summary ---- */
+const stats = {
+  commits: commits.length,
+  files: new Set(raw.map(d => d.file)).size,
+  totalLoc: raw.length,
+  maxDepth: d3.max(raw, d => +d.depth || 0) ?? 0,
+  longestLine: d3.max(raw, d => +d.length || 0) ?? 0,
+  maxLines: d3.max(d3.rollups(raw, v => v.length, d => d.file).map(d => d[1])) ?? 0
+};
 
-d3.select("#stats").html(`
-  <dt>Total files analyzed</dt><dd>${data.length}</dd>
-  <dt>Total lines of code</dt><dd>${d3.sum(data, d => d.totalLines)}</dd>
-  <dt>File types included</dt><dd>${new Set(data.map(d => d.language)).size}</dd>
-`);
+/* Render as a single-row grid (no <dl> stacking) */
+d3.select("#stats").html([
+  ["Commits", stats.commits],
+  ["Files", stats.files],
+  ["Total LOC", stats.totalLoc],
+  ["Max Depth", stats.maxDepth],
+  ["Longest Line", stats.longestLine],
+  ["Max Lines", stats.maxLines],
+].map(([k,v]) => `
+  <div class="stat">
+    <span class="k">${k}</span>
+    <span class="v">${fmtInt(v)}</span>
+  </div>
+`).join(""));
 
-  // --- scales & axes (Step 2) ---
-  const x = d3.scaleTime()
-    .domain(d3.extent(data, d => d.when))
-    .range([0, innerW]);
+/* ---- Scales & axes ---- */
+const x = d3.scaleTime()
+  .domain(d3.extent(commits, d => d.when))
+  .range([0, innerW])
+  .nice();
 
-  const y = d3.scaleLinear()
-    .domain([0,24]).nice()
-    .range([innerH, 0]);
+const y = d3.scaleLinear()
+  .domain([0, 24])
+  .range([innerH, 0]);
 
-  const r = d3.scaleSqrt()               // Step 4: sqrt for area perception
-    .domain(d3.extent(data, d => d.totalLines))
-    .range([2, 12]);
+const r = d3.scaleSqrt()
+  .domain([1, d3.max(commits, d => d.linesTouched) || 1])
+  .range([2, 10]);
 
-  g.append("g").attr("transform", `translate(0,${innerH})`).call(d3.axisBottom(x));
-  g.append("g").call(d3.axisLeft(y).ticks(13).tickFormat(h => `${String(h).padStart(2,"0")}:00`));
+g.append("g")
+  .attr("class","x axis")
+  .attr("transform", `translate(0,${innerH})`)
+  .call(d3.axisBottom(x).ticks(10));
 
-  // grid lines
-  g.append("g")
-    .attr("class","grid")
-    .call(d3.axisLeft(y).tickSize(-innerW).tickFormat(""))
-    .selectAll("line").attr("opacity", 0.6);
+g.append("g")
+  .attr("class","y axis")
+  .call(d3.axisLeft(y)
+        .ticks(13)
+        .tickFormat(h => `${String(h).padStart(2,"0")}:00`));
 
-  // --- dots, sorted big→small so small sit on top (Step 4.3) ---
-  const dots = g.append("g").attr("class","dots")
-    .selectAll("circle")
-    .data([...data].sort((a,b) => d3.descending(a.totalLines, b.totalLines)))
-    .join("circle")
-      .attr("cx", d => x(d.when))
-      .attr("cy", d => y(d.hour))
-      .attr("r", d => r(d.totalLines))
-      .attr("fill", "#4682b4")
-      .attr("fill-opacity", 0.75);
+/* grid lines on white */
+g.append("g")
+  .attr("class","grid")
+  .call(d3.axisLeft(y).tickSize(-innerW).tickFormat(""));
 
-  // --- tooltip (Step 3) ---
-  dots.on("mouseenter", (e,d) => {
-      tooltip.attr("hidden", null).html(
-        `<strong>${d.author ?? "unknown"}</strong><br>${fmtTime(d.when)}<br>${d.path}<br>± ${d.totalLines} lines`
-      );
-    })
-    .on("mousemove", (e) => {
-      tooltip.style("left", (e.clientX + 12) + "px").style("top", (e.clientY + 12) + "px");
+/* ---- Dots (theme blue via CSS var) ---- */
+const dots = g.append("g").selectAll("circle")
+  .data(commits)
+  .join("circle")
+    .attr("class","dot")
+    .attr("cx", d => x(d.when))
+    .attr("cy", d => y(d.hour))
+    .attr("r",  d => r(d.linesTouched))
+    .attr("fill", "var(--accent)")
+    .attr("fill-opacity", .95)
+    .on("mouseenter", (e,d) => {
+      tooltip
+        .style("left", (e.clientX + 12) + "px")
+        .style("top",  (e.clientY + 12) + "px")
+        .attr("hidden", null)
+        .html(
+          `<strong>${d.author ?? "unknown"}</strong><br>` +
+          `${fmtTimeLong(d.when)}<br>` +
+          `Lines touched: ${fmtInt(d.linesTouched)}<br>` +
+          `Files touched: ${fmtInt(d.filesTouched)}<br>` +
+          `<code>${d.sampleFile ?? ""}</code>`
+        );
     })
     .on("mouseleave", () => tooltip.attr("hidden", true));
 
-  // --- brushing (Step 5) ---
-  const brush = d3.brush()
-    .extent([[0,0],[innerW, innerH]])
-    .on("brush end", ({selection}) => {
-      if (!selection) { updateSelection([]); return; }
-      const [[x0,y0],[x1,y1]] = selection;
-      const picked = data.filter(d =>
-        x0 <= x(d.when) && x(d.when) <= x1 && y0 <= y(d.hour) && y(d.hour) <= y1
-      );
-      updateSelection(picked);
-    });
-
-  const brushLayer = g.append("g").attr("class","brush").call(brush);
-  brushLayer.raise(); // make sure brush sits on top so you can drag
-
-  function updateSelection(picked){
-    d3.select("#selection-count").text(`Selected: ${picked.length} commits`);
-    // language breakdown example
-    const byLang = d3.rollups(picked, v => d3.sum(v, d => d.totalLines), d => d.language ?? "unknown")
-                     .sort((a,b) => d3.descending(a[1], b[1]));
-    d3.select("#selection-breakdown").html(
-      byLang.map(([lang,lines]) => `<div>${lang}: ${lines} lines</div>`).join("")
+/* ---- Brush selection ---- */
+const brush = d3.brush()
+  .extent([[0,0],[innerW, innerH]])
+  .on("brush end", ({selection}) => {
+    if (!selection){ updateSelection(commits); return; }
+    const [[x0,y0],[x1,y1]] = selection;
+    const picked = commits.filter(d =>
+      x0 <= x(d.when) && x(d.when) <= x1 &&
+      y0 <= y(d.hour) && y(d.hour) <= y1
     );
-    dots.attr("stroke", d => picked.includes(d) ? "black" : null)
-        .attr("stroke-width", d => picked.includes(d) ? 1 : null)
-        .attr("fill-opacity", d => picked.includes(d) ? 1 : 0.35);
-  }
-});
+    updateSelection(picked);
+  });
+
+g.append("g").attr("class","brush").call(brush);
+
+/* Initial selection = all */
+updateSelection(commits);
+
+function updateSelection(arr){
+  d3.select("#selection-count").text(`Selected: ${fmtInt(arr.length)} commits`);
+  const byAuthor = d3.rollups(arr, v => v.length, d => d.author ?? "unknown")
+                     .sort((a,b) => d3.descending(a[1], b[1]))
+                     .slice(0,5);
+  d3.select("#selection-breakdown").html(
+    `<h4>Top authors</h4>` +
+    byAuthor.map(([k,v]) => `<div>${k}: ${fmtInt(v)}</div>`).join("")
+  );
+
+  const pickedSet = new Set(arr.map(d => d.commit));
+  dots.attr("opacity", d => pickedSet.has(d.commit) ? 1 : 0.25)
+      .attr("stroke", d => pickedSet.has(d.commit) ? "#000" : null)
+      .attr("stroke-width", d => pickedSet.has(d.commit) ? 1 : null);
+}

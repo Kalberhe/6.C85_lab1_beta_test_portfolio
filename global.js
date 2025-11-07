@@ -11,8 +11,10 @@ const pages = [
   { url: "projects/", title: "Projects" },
   { url: "contact/",  title: "Contact" },
   { url: "resume/",   title: "Resume" },
+  { url: "Meta/",     title: "Meta" }, 
   { url: "https://github.com/Kalberhe", title: "GitHub" },
 ];
+
 
 
 const nav = document.createElement("nav");
