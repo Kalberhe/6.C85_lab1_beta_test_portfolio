@@ -1,0 +1,27 @@
+{
+  "name": "6.c85_lab1_beta_test_portfolio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kalberhe/6.C85_lab1_beta_test_portfolio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Kalberhe/6.C85_lab1_beta_test_portfolio/issues"
+  },
+  "homepage": "https://github.com/Kalberhe/6.C85_lab1_beta_test_portfolio#readme",
+  "devDependencies": {
+    "elocuent": "^0.0.4"
+  }
+}

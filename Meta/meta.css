@@ -1,0 +1,12 @@
+#tooltip {
+  position: fixed;
+  padding: .5rem .7rem;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: .5rem;
+  box-shadow: 0 2px 12px rgba(0,0,0,.12);
+  pointer-events: none;
+  font-size: .9rem;
+}
+#scatter { background: #fafafa; }
+.grid line { stroke: #e8e8e8; }
