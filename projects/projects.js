@@ -224,5 +224,27 @@ if (searchInput) {
 (async function main() {
   const data = await fetchJSON("../lib/projects.json");
   allProjects = Array.isArray(data) ? data : [];
+
+  // 🔹 Add your Bikewatching project here
+  const bikewatchingProject = {
+    title: "Bikewatching",
+    year: 2025, // adjust if you want a different year bucket
+    image: "assets/bikewatching-thumb.png", // or remove/NULL to use placeholder
+    description:
+      "Interactive map of Boston-area bike lanes and BlueBike station traffic built with Mapbox GL JS and D3.",
+    links: [
+      {
+        href: "https://kalberhe.github.io/bikewatching/",
+        label: "Live demo",
+      },
+      {
+        href: "https://github.com/Kalberhe/bikewatching",
+        label: "Source code",
+      },
+    ],
+  };
+
+  allProjects.push(bikewatchingProject);
+
   syncAndRender(true);
 })();
