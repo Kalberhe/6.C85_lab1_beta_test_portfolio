@@ -16,7 +16,7 @@ svg.insert("rect", ":first-child")
 
 const g = svg.append("g").attr("transform", `translate(${M.l},${M.t})`);
 
-/* Tooltip */
+/* Tooltip + formatters */
 const tooltip = d3.select("#tooltip");
 const fmtInt = d3.format(",");
 const fmtPct = d3.format(".1~%");
@@ -30,6 +30,9 @@ function themeAccent() {
 }
 const ACCENT = themeAccent();
 const SELECTED = "#ff6b6b";
+
+/* color scale for file lines (Step 2.4) */
+const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
 
 /* ---- Load CSV ---- */
 const raw = await d3.csv("./loc.csv", d3.autoType);
@@ -137,6 +140,8 @@ g.append("g").attr("class", "dots");
 
 /* ---- Initial draw ---- */
 updateScatterPlot(commits);
+// also initialize file view with all commits
+updateFileDisplay(commits);
 
 /* ---- Slider callback ---- */
 function onTimeSliderChange() {
@@ -153,6 +158,7 @@ function onTimeSliderChange() {
 
   filteredCommits = commits.filter(d => d.when <= commitMaxTime);
   updateScatterPlot(filteredCommits);
+  updateFileDisplay(filteredCommits);   // ★ Step 2: keep file viz in sync
 }
 
 /* Attach + init */
@@ -186,7 +192,7 @@ function updateScatterPlot(dataNow) {
     .attr("cy", d => y(d.hour))
     .attr("r", d => r(d.linesTouched))
     .attr("fill", ACCENT)
-    .attr("fill-opacity", .6)
+    .attr("fill-opacity", 0.6)
     .on("mouseenter", (e, d) => {
       tooltip
         .style("left", (e.clientX + 12) + "px")
@@ -279,4 +285,43 @@ function updateSelection(picked) {
     container.append("dd")
       .text(`${fmtInt(cnt)} lines (${fmtPct(cnt / total)})`);
   });
+}
+
+/* ---- Step 2: Unit visualization of files ---- */
+function updateFileDisplay(commitsNow) {
+  const container = d3.select("#files");
+  if (container.empty()) return;   // if you forgot the <dl id="files">, fail silently
+
+  // Flatten all lines from the current commits
+  const lines = commitsNow.flatMap(d => d.lines || []);
+
+  // Group by file name
+  let files = d3.groups(lines, d => d.file)
+    .map(([name, lines]) => ({ name, lines }))
+    .sort((a, b) => b.lines.length - a.lines.length);  // biggest file first
+
+  // One <div> per file
+  const blocks = container
+    .selectAll("div.file-block")
+    .data(files, d => d.name)
+    .join(enter => {
+      const div = enter.append("div").attr("class", "file-block");
+      div.append("dt").append("code");
+      div.append("dd");
+      return div;
+    });
+
+  // filename + line count
+  blocks.select("dt code")
+    .html(d => `${d.name}<br><small>${d.lines.length} lines</small>`);
+
+  // inside each <dd>: one .loc per line
+  blocks.select("dd")
+    .selectAll("div.loc")
+    .data(d => d.lines)
+    .join("div")
+    .attr("class", "loc")
+    .style("background-color", line =>
+      colorScale(bucket(line.type ?? line.language ?? line.ext))
+    );
 }

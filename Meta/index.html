@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="meta.css" />
   <script type="module" src="https://cdn.jsdelivr.net/npm/d3@7/+esm"></script>
 </head>
+
 <body>
   <main class="container">
     <h1>Meta</h1>
@@ -22,25 +23,33 @@
     <!-- Scatter -->
     <section id="viz">
       <h2>Commits by Date &amp; Hour</h2>
+
       <div id="time-filter" style="margin-bottom: 1rem; display:flex; align-items:center; gap:1rem;">
-  <label for="commit-progress" style="font-weight:600;">Show commits until:</label>
+        <label for="commit-progress" style="font-weight:600;">Show commits until:</label>
 
-  <input type="range" id="commit-progress" min="0" max="100" value="100" style="flex:1;">
+        <input type="range" id="commit-progress" min="0" max="100" value="100" style="flex:1;">
 
-  <time id="commit-time" style="margin-left:auto; font-size:.9rem; color:var(--muted);">
-    ---
-  </time>
-</div>
+        <time id="commit-time" style="margin-left:auto; font-size:.9rem; color:var(--muted);">
+          ---
+        </time>
+      </div>
+
       <div class="chart-card">
         <svg id="scatter" width="900" height="420" role="img" aria-label="Commits by date and hour"></svg>
+
         <p id="selection-count">No commits selected</p>
         <dl id="language-breakdown" class="stats"></dl>
       </div>
+
       <div id="tooltip" hidden></div>
     </section>
+    <section id="files-section">
+      <h2>Files by Lines of Code</h2>
+      <dl id="files" class="files-grid"></dl>
+    </section>
+
   </main>
- 
-  
+
   <script type="module" src="meta.js"></script>
 </body>
 </html>
