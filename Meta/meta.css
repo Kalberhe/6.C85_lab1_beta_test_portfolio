@@ -1,14 +1,40 @@
 /* -------- Theme hooks -------- */
-:root{
-  /* If your site already defines a blue variable, swap this to match. */
+:root {
   --accent: #2563eb;
   --muted: #6b7280;
   --border: rgba(0,0,0,.15);
   --grid: #e5e7eb;
 }
 
-/* -------- Summary bar like your reference (single horizontal row) -------- */
-.summary-bar{
+/* -------- Files by LOC list (Step 2) -------- */
+
+#files-section h2 {
+  margin-bottom: 0.5rem;
+}
+
+.files-grid {
+  /* dl#files */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  row-gap: 0.3rem;
+  column-gap: 2rem;
+  margin: 0 0 1.5rem 0;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.files-grid dt {
+  margin: 0;
+}
+
+.files-grid dd {
+  margin: 0;
+  text-align: right;
+  color: var(--muted);
+}
+
+/* -------- Summary bar like your reference -------- */
+.summary-bar {
   display: grid;
   grid-template-columns: repeat(6, minmax(120px, 1fr));
   gap: 22px 28px;
@@ -18,54 +44,76 @@
   border-bottom: 1px solid var(--border);
 }
 
-.summary-bar .stat .k{
-  font-size: .72rem;
-  letter-spacing: .08em;
+.summary-bar .stat .k {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
   display: block;
   margin-bottom: 4px;
 }
-.summary-bar .stat .v{
+
+.summary-bar .stat .v {
   font-size: 1.9rem;
   font-weight: 700;
   line-height: 1;
 }
 
-/* Responsive: collapse to 3 columns on narrow screens */
-@media (max-width: 960px){
-  .summary-bar{ grid-template-columns: repeat(3, minmax(120px, 1fr)); }
+/* Responsive summary */
+@media (max-width: 960px) {
+  .summary-bar {
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+  }
 }
 
-/* -------- Chart card: always white, with hidden overflow -------- */
-.chart-card{
+/* -------- Time slider strip -------- */
+.time-filter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.75rem 0 1rem 0;
+}
+
+.time-filter label {
+  font-weight: 600;
+}
+
+.time-filter input[type="range"] {
+  flex: 1;
+}
+
+.time-filter time {
+  margin-left: auto;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* -------- Chart card -------- */
+.chart-card {
   display: inline-block;
   background: #fff !important;
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 10px;
   box-shadow: 0 1px 2px rgba(0,0,0,.06);
-  overflow: hidden; /* prevents any visual “cut off” at edges */
+  overflow: hidden;
 }
 
-/* Axes are black so they’re visible in dark mode too */
+/* Axes visible in both themes */
 #scatter .axis path,
-#scatter .axis line{ stroke:#111; }
+#scatter .axis line { stroke:#111; }
+
 #scatter .x.axis text,
-#scatter .y.axis text{ fill:#111; font-size:.8rem; }
+#scatter .y.axis text {
+  fill:#111;
+  font-size:0.8rem;
+}
 
 /* Light grid on the white card */
-#scatter .grid line{ stroke: var(--grid); }
-
-/* Dots use theme blue */
-#scatter .dot{
-  fill: var(--accent);
-  stroke: rgba(0,0,0,.25);
-  stroke-width: .5px;
-}
+#scatter .grid line { stroke: var(--grid); }
 
 /* Tooltip */
-#tooltip{
+#tooltip {
   position: fixed;
   pointer-events: none;
   background:#fff;
@@ -74,14 +122,15 @@
   border-radius:6px;
   padding:6px 8px;
   box-shadow:0 4px 12px rgba(0,0,0,.12);
-  font-size:.85rem;
+  font-size:0.85rem;
   max-width: 280px;
   z-index: 20;
 }
-/* Chart look (leave as-is if you already added similar rules) */
+
+/* Chart look */
 #scatter { background: none; }
 
-/* grid + axes */
+/* grid + axes in light / dark */
 .grid line { stroke: #e7ebf0; }
 .axis path, .axis line { stroke: #cfd6df; }
 .axis text { fill: #222; }
@@ -93,35 +142,36 @@ html[data-theme="dark"] .axis text { fill: #e8eaed; }
 
 /* dots: theme blue; selected = red */
 .dots circle {
-  fill: #4f79ff;           /* theme blue */
-  fill-opacity: .6;
+  fill: #4f79ff;
+  fill-opacity: 0.6;
+  stroke: rgba(0,0,0,.25);
+  stroke-width: 0.5px;
   transition: 150ms transform, 150ms fill-opacity;
   transform-box: fill-box;
   transform-origin: center;
 }
-.dots circle:hover { transform: scale(1.2); fill-opacity: 1; }
-.dots circle.selected { fill: #ff6b6b; }  /* red when brushed*/
 
-/* nice compact stat list */
-.stats {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: .4rem 1rem;
-  margin-top: .5rem;
+.dots circle:hover {
+  transform: scale(1.2);
+  fill-opacity: 1;
 }
-.stats dt { opacity:.7; font-variant: all-small-caps; letter-spacing:.03em; }
-.stats dd { margin:0; }
+
+.dots circle.selected {
+  fill: #ff6b6b;
+}
+
 /* Force red fill for selected dots */
 .dot[fill="#ff6b6b"],
 .dots circle[fill="#ff6b6b"] {
   fill: #ff6b6b !important;
 }
 
-/* optional: make them pop slightly */
 .dot[fill="#ff6b6b"] {
   stroke: #000;
   stroke-width: 1;
 }
+
+/* Smooth radius / position transitions */
 .dot {
   transition: r 300ms, cx 300ms, cy 300ms, fill-opacity 200ms;
 }
@@ -130,4 +180,22 @@ html[data-theme="dark"] .axis text { fill: #e8eaed; }
   @starting-style {
     r: 0;
   }
+}
+
+/* Language breakdown list */
+.stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.4rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.stats dt {
+  opacity: 0.7;
+  font-variant: all-small-caps;
+  letter-spacing: 0.03em;
+}
+
+.stats dd {
+  margin: 0;
 }

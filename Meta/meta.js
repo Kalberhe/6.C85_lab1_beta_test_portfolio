@@ -7,7 +7,7 @@ const innerW = W - M.l - M.r, innerH = H - M.t - M.b;
 /* ---- SVG ---- */
 const svg = d3.select("#scatter").attr("width", W).attr("height", H);
 
-/* Solid white background INSIDE the SVG so it’s white in all themes */
+/* Solid white background so card is white in both themes */
 svg.selectAll("*").remove();
 svg.insert("rect", ":first-child")
   .attr("x", 0).attr("y", 0)
@@ -30,9 +30,6 @@ function themeAccent() {
 }
 const ACCENT = themeAccent();
 const SELECTED = "#ff6b6b";
-
-/* color scale for file lines (Step 2.4) */
-const colorScale = d3.scaleOrdinal(d3.schemeTableau10);
 
 /* ---- Load CSV ---- */
 const raw = await d3.csv("./loc.csv", d3.autoType);
@@ -60,10 +57,10 @@ const commits = d3.rollups(
   },
   d => d.commit
 )
-.map(d => d[1])
-.sort((a, b) => d3.ascending(a.when, b.when));
+  .map(d => d[1])
+  .sort((a, b) => d3.ascending(a.when, b.when));
 
-/* --- Lab 8 Slider State --- */
+/* --- Slider state --- */
 let commitProgress = 100;
 
 const timeScale = d3.scaleTime()
@@ -73,7 +70,7 @@ const timeScale = d3.scaleTime()
 let commitMaxTime = timeScale.invert(commitProgress);
 let filteredCommits = commits;
 
-/* Summary stats */
+/* ---- Summary stats ---- */
 const stats = {
   commits: commits.length,
   files: new Set(raw.map(d => d.file)).size,
@@ -135,12 +132,11 @@ g.append("g")
       .tickFormat(h => `${String(h % 24).padStart(2, "0")}:00`)
   );
 
-/* ---- DOTS GROUP (important for updates) ---- */
+/* ---- Dots group ---- */
 g.append("g").attr("class", "dots");
 
-/* ---- Initial draw ---- */
+/* Initial draw */
 updateScatterPlot(commits);
-// also initialize file view with all commits
 updateFileDisplay(commits);
 
 /* ---- Slider callback ---- */
@@ -157,58 +153,60 @@ function onTimeSliderChange() {
     });
 
   filteredCommits = commits.filter(d => d.when <= commitMaxTime);
+
   updateScatterPlot(filteredCommits);
-  updateFileDisplay(filteredCommits);   // ★ Step 2: keep file viz in sync
+  updateFileDisplay(filteredCommits);
 }
 
-/* Attach + init */
 document.getElementById("commit-progress")
   .addEventListener("input", onTimeSliderChange);
+
+/* initialize text + filters */
 onTimeSliderChange();
 
-/* ---- UPDATE SCATTER PLOT ---- */
+/* ---- Update scatter plot ---- */
 function updateScatterPlot(dataNow) {
+  if (!dataNow.length) {
+    // If no commits in range, keep axes but clear dots
+    g.select("g.dots").selectAll("circle").remove();
+    return;
+  }
 
-  // 1. Update x-domain
+  // Update x-domain & axis
   x.domain(d3.extent(dataNow, d => d.when));
   svg.select(".x.axis").call(d3.axisBottom(x));
 
-  // 2. Sort data
   const sorted = d3.sort(dataNow, d => -d.linesTouched);
 
-  // 3. Data join with key
   const circles = g.select("g.dots")
     .selectAll("circle")
     .data(sorted, d => d.commit);
 
-  // Exit
   circles.exit().remove();
 
-  // Enter
   const enter = circles.enter()
     .append("circle")
-    .attr("class", "dot")
-    .attr("cx", d => x(d.when))
-    .attr("cy", d => y(d.hour))
-    .attr("r", d => r(d.linesTouched))
-    .attr("fill", ACCENT)
-    .attr("fill-opacity", 0.6)
-    .on("mouseenter", (e, d) => {
-      tooltip
-        .style("left", (e.clientX + 12) + "px")
-        .style("top", (e.clientY + 12) + "px")
-        .attr("hidden", null)
-        .html(
-          `<strong>${d.author ?? "unknown"}</strong><br>` +
-          `${fmtTimeLong(d.when)}<br>` +
-          `Lines touched: ${fmtInt(d.linesTouched)}<br>` +
-          `Files touched: ${fmtInt(d.filesTouched)}<br>` +
-          `<code>${d.sampleFile ?? ""}</code>`
-        );
-    })
-    .on("mouseleave", () => tooltip.attr("hidden", true));
+      .attr("class", "dot")
+      .attr("cx", d => x(d.when))
+      .attr("cy", d => y(d.hour))
+      .attr("r", d => r(d.linesTouched))
+      .attr("fill", ACCENT)
+      .attr("fill-opacity", 0.6)
+      .on("mouseenter", (e, d) => {
+        tooltip
+          .style("left", (e.clientX + 12) + "px")
+          .style("top", (e.clientY + 12) + "px")
+          .attr("hidden", null)
+          .html(
+            `<strong>${d.author ?? "unknown"}</strong><br>` +
+            `${fmtTimeLong(d.when)}<br>` +
+            `Lines touched: ${fmtInt(d.linesTouched)}<br>` +
+            `Files touched: ${fmtInt(d.filesTouched)}<br>` +
+            `<code>${d.sampleFile ?? ""}</code>`
+          );
+      })
+      .on("mouseleave", () => tooltip.attr("hidden", true));
 
-  // Update + merged
   enter.merge(circles)
     .attr("cx", d => x(d.when))
     .attr("cy", d => y(d.hour))
@@ -232,7 +230,6 @@ const brush = d3.brush()
   });
 
 g.append("g").attr("class", "brush").call(brush);
-
 updateSelection([]);
 
 /* ---- Language aggregator ---- */
@@ -248,19 +245,16 @@ function bucket(langRaw) {
 function updateSelection(picked) {
   const pickedSet = new Set(picked.map(d => d.commit));
 
-  // Re-select dots fresh each time
   g.select("g.dots").selectAll("circle")
     .attr("fill", d => pickedSet.has(d.commit) ? SELECTED : ACCENT)
     .attr("fill-opacity", d => pickedSet.has(d.commit) ? 1 : 0.25)
     .attr("stroke", d => pickedSet.has(d.commit) ? "#000" : null)
     .attr("stroke-width", d => pickedSet.has(d.commit) ? 1 : null);
 
-  /* text */
   const count = picked.length;
   d3.select("#selection-count")
     .text(`${count ? count : "No"} commits selected`);
 
-  /* language breakdown */
   const container = d3.select("#language-breakdown");
   container.html("");
 
@@ -287,41 +281,20 @@ function updateSelection(picked) {
   });
 }
 
-/* ---- Step 2: Unit visualization of files ---- */
-function updateFileDisplay(commitsNow) {
+/* ---- Step 2: Files by LOC (driven by commits in range) ---- */
+function updateFileDisplay(sourceCommits) {
   const container = d3.select("#files");
-  if (container.empty()) return;   // if you forgot the <dl id="files">, fail silently
+  container.html("");               // clear existing list
 
-  // Flatten all lines from the current commits
-  const lines = commitsNow.flatMap(d => d.lines || []);
+  const lines = sourceCommits.flatMap(d => d.lines || []);
+  if (!lines.length) return;
 
-  // Group by file name
-  let files = d3.groups(lines, d => d.file)
-    .map(([name, lines]) => ({ name, lines }))
-    .sort((a, b) => b.lines.length - a.lines.length);  // biggest file first
+  const files = d3.groups(lines, d => d.file)
+    .map(([name, lines]) => ({ name, count: lines.length }))
+    .sort((a, b) => b.count - a.count);
 
-  // One <div> per file
-  const blocks = container
-    .selectAll("div.file-block")
-    .data(files, d => d.name)
-    .join(enter => {
-      const div = enter.append("div").attr("class", "file-block");
-      div.append("dt").append("code");
-      div.append("dd");
-      return div;
-    });
-
-  // filename + line count
-  blocks.select("dt code")
-    .html(d => `${d.name}<br><small>${d.lines.length} lines</small>`);
-
-  // inside each <dd>: one .loc per line
-  blocks.select("dd")
-    .selectAll("div.loc")
-    .data(d => d.lines)
-    .join("div")
-    .attr("class", "loc")
-    .style("background-color", line =>
-      colorScale(bucket(line.type ?? line.language ?? line.ext))
-    );
+  files.forEach(f => {
+    container.append("dt").text(f.name);
+    container.append("dd").text(`${f.count} lines`);
+  });
 }
