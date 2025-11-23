@@ -7,7 +7,7 @@ const innerW = W - M.l - M.r, innerH = H - M.t - M.b;
 /* ---- SVG ---- */
 const svg = d3.select("#scatter").attr("width", W).attr("height", H);
 
-/* Solid white background so card is white in both themes */
+/* Solid white background INSIDE the SVG so it’s white in all themes */
 svg.selectAll("*").remove();
 svg.insert("rect", ":first-child")
   .attr("x", 0).attr("y", 0)
@@ -30,6 +30,9 @@ function themeAccent() {
 }
 const ACCENT = themeAccent();
 const SELECTED = "#ff6b6b";
+
+/* color scale for technologies (Step 2.4) */
+const colors = d3.scaleOrdinal(d3.schemeTableau10);
 
 /* ---- Load CSV ---- */
 const raw = await d3.csv("./loc.csv", d3.autoType);
@@ -57,10 +60,10 @@ const commits = d3.rollups(
   },
   d => d.commit
 )
-  .map(d => d[1])
-  .sort((a, b) => d3.ascending(a.when, b.when));
+.map(d => d[1])
+.sort((a, b) => d3.ascending(a.when, b.when));
 
-/* --- Slider state --- */
+/* --- Slider state (0–100 mapped across full time range) --- */
 let commitProgress = 100;
 
 const timeScale = d3.scaleTime()
@@ -68,38 +71,9 @@ const timeScale = d3.scaleTime()
   .range([0, 100]);
 
 let commitMaxTime = timeScale.invert(commitProgress);
-let filteredCommits = commits;
+let filteredCommits = commits.slice();   // start with all
 
-/* ---- Summary stats ---- */
-const stats = {
-  commits: commits.length,
-  files: new Set(raw.map(d => d.file)).size,
-  totalLoc: raw.length,
-  maxDepth: d3.max(raw, d => +d.depth || 0) ?? 0,
-  longestLine: d3.max(raw, d => +d.length || 0) ?? 0,
-  maxLines: d3.max(
-    d3.rollups(raw, v => v.length, d => d.file).map(d => d[1])
-  ) ?? 0
-};
-
-d3.select("#stats").html(
-  [
-    ["Commits", stats.commits],
-    ["Files", stats.files],
-    ["Total LOC", stats.totalLoc],
-    ["Max Depth", stats.maxDepth],
-    ["Longest Line", stats.longestLine],
-    ["Max Lines", stats.maxLines],
-  ]
-    .map(([k, v]) => `
-      <div class="stat">
-        <span class="k">${k}</span>
-        <span class="v">${fmtInt(v)}</span>
-      </div>
-    `).join("")
-);
-
-/* ---- Scales & axes ---- */
+/* ---- Scales & axes for scatter ---- */
 const x = d3.scaleTime()
   .domain(d3.extent(commits, d => d.when))
   .range([0, innerW])
@@ -132,47 +106,106 @@ g.append("g")
       .tickFormat(h => `${String(h % 24).padStart(2, "0")}:00`)
   );
 
-/* ---- Dots group ---- */
+/* group for dots (so we can rebind data) */
 g.append("g").attr("class", "dots");
 
-/* Initial draw */
-updateScatterPlot(commits);
-updateFileDisplay(commits);
+/* ---------- helpers to recompute stats / files ---------- */
 
-/* ---- Slider callback ---- */
-function onTimeSliderChange() {
-  const slider = document.getElementById("commit-progress");
-  commitProgress = +slider.value;
+function computeStatsFromCommits(subset) {
+  const lines = subset.flatMap(d => d.lines || []);
 
-  commitMaxTime = timeScale.invert(commitProgress);
-
-  document.getElementById("commit-time").textContent =
-    commitMaxTime.toLocaleString(undefined, {
-      dateStyle: "long",
-      timeStyle: "short"
-    });
-
-  filteredCommits = commits.filter(d => d.when <= commitMaxTime);
-
-  updateScatterPlot(filteredCommits);
-  updateFileDisplay(filteredCommits);
-}
-
-document.getElementById("commit-progress")
-  .addEventListener("input", onTimeSliderChange);
-
-/* initialize text + filters */
-onTimeSliderChange();
-
-/* ---- Update scatter plot ---- */
-function updateScatterPlot(dataNow) {
-  if (!dataNow.length) {
-    // If no commits in range, keep axes but clear dots
-    g.select("g.dots").selectAll("circle").remove();
-    return;
+  if (!lines.length) {
+    return {
+      commits: 0,
+      files: 0,
+      totalLoc: 0,
+      maxDepth: 0,
+      longestLine: 0,
+      maxLines: 0
+    };
   }
 
-  // Update x-domain & axis
+  const files = d3.rollups(lines, v => v.length, d => d.file);
+  const depths = lines.map(d => +d.depth || 0);
+  const lengths = lines.map(d => +d.length || 0);
+
+  return {
+    commits: subset.length,
+    files: new Set(lines.map(d => d.file)).size,
+    totalLoc: lines.length,
+    maxDepth: d3.max(depths),
+    longestLine: d3.max(lengths),
+    maxLines: d3.max(files, d => d[1])
+  };
+}
+
+function updateSummary(subset) {
+  const stats = computeStatsFromCommits(subset);
+  d3.select("#stats").html(
+    [
+      ["Commits", stats.commits],
+      ["Files", stats.files],
+      ["Total LOC", stats.totalLoc],
+      ["Max Depth", stats.maxDepth],
+      ["Longest Line", stats.longestLine],
+      ["Max Lines", stats.maxLines],
+    ]
+      .map(([k, v]) => `
+        <div class="stat">
+          <span class="k">${k}</span>
+          <span class="v">${fmtInt(v)}</span>
+        </div>
+      `)
+      .join("")
+  );
+}
+
+/* unit visualization for files (Step 2.2–2.4) */
+function updateFileDisplay(subset) {
+  const lines = subset.flatMap(d => d.lines || []);
+
+  const files = d3.groups(lines, d => d.file)
+    .map(([name, lines]) => ({ name, lines }))
+    .sort((a, b) => b.lines.length - a.lines.length);  // Step 2.3
+
+  const container = d3.select("#files");
+
+  const rows = container
+    .selectAll("div.file")
+    .data(files, d => d.name);
+
+  rows.exit().remove();
+
+  const rowsEnter = rows.enter()
+    .append("div")
+    .attr("class", "file");
+
+  rowsEnter.append("dt");
+  rowsEnter.append("dd");
+
+  const merged = rowsEnter.merge(rows);
+
+  // filename + line count
+  merged.select("dt")
+    .html(d => `<code>${d.name}</code><small>${d.lines.length} lines</small>`);
+
+  // one dot per line
+  merged.select("dd")
+    .selectAll("div.loc")
+    .data(d => d.lines)
+    .join("div")
+      .attr("class", "loc")
+      .attr("style", d => {
+        const t = d.type || d.language || d.ext || "other";
+        return `--loc-color:${colors(t)}`;
+      });
+}
+
+/* ---------- scatter update ---------- */
+
+function updateScatterPlot(dataNow) {
+
+  // Update x-domain to current window
   x.domain(d3.extent(dataNow, d => d.when));
   svg.select(".x.axis").call(d3.axisBottom(x));
 
@@ -213,7 +246,8 @@ function updateScatterPlot(dataNow) {
     .attr("r", d => r(d.linesTouched));
 }
 
-/* ---- Brush ---- */
+/* ---------- Brush for selection ---------- */
+
 const brush = d3.brush()
   .extent([[0, 0], [innerW, innerH]])
   .on("brush end", ({ selection }) => {
@@ -222,7 +256,7 @@ const brush = d3.brush()
       return;
     }
     const [[x0, y0], [x1, y1]] = selection;
-    const picked = commits.filter(d =>
+    const picked = filteredCommits.filter(d =>
       x0 <= x(d.when) && x(d.when) <= x1 &&
       y0 <= y(d.hour) && y(d.hour) <= y1
     );
@@ -230,9 +264,7 @@ const brush = d3.brush()
   });
 
 g.append("g").attr("class", "brush").call(brush);
-updateSelection([]);
 
-/* ---- Language aggregator ---- */
 function bucket(langRaw) {
   const s = String(langRaw ?? "").toLowerCase();
   if (/(html|htm|ejs|pug|twig)/.test(s)) return "HTML";
@@ -241,11 +273,11 @@ function bucket(langRaw) {
   return "Other";
 }
 
-/* ---- Selection updater ---- */
 function updateSelection(picked) {
   const pickedSet = new Set(picked.map(d => d.commit));
 
   g.select("g.dots").selectAll("circle")
+    .classed("selected", d => pickedSet.has(d.commit))
     .attr("fill", d => pickedSet.has(d.commit) ? SELECTED : ACCENT)
     .attr("fill-opacity", d => pickedSet.has(d.commit) ? 1 : 0.25)
     .attr("stroke", d => pickedSet.has(d.commit) ? "#000" : null)
@@ -258,7 +290,7 @@ function updateSelection(picked) {
   const container = d3.select("#language-breakdown");
   container.html("");
 
-  const pool = count ? picked : commits;
+  const pool = count ? picked : filteredCommits;
   const lines = pool.flatMap(d => d.lines || []);
   if (!lines.length) return;
 
@@ -281,20 +313,37 @@ function updateSelection(picked) {
   });
 }
 
-/* ---- Step 2: Files by LOC (driven by commits in range) ---- */
-function updateFileDisplay(sourceCommits) {
-  const container = d3.select("#files");
-  container.html("");               // clear existing list
+/* ---------- Slider callback (central controller) ---------- */
 
-  const lines = sourceCommits.flatMap(d => d.lines || []);
-  if (!lines.length) return;
+function onTimeSliderChange() {
+  const slider = document.getElementById("commit-progress");
+  commitProgress = +slider.value;
 
-  const files = d3.groups(lines, d => d.file)
-    .map(([name, lines]) => ({ name, count: lines.length }))
-    .sort((a, b) => b.count - a.count);
+  commitMaxTime = timeScale.invert(commitProgress);
 
-  files.forEach(f => {
-    container.append("dt").text(f.name);
-    container.append("dd").text(`${f.count} lines`);
-  });
+  document.getElementById("commit-time").textContent =
+    commitMaxTime.toLocaleString(undefined, {
+      dateStyle: "long",
+      timeStyle: "short"
+    });
+
+  filteredCommits = commits.filter(d => d.when <= commitMaxTime);
+
+  // keep everything in sync with the filtered subset
+  updateFileDisplay(filteredCommits);
+  updateSummary(filteredCommits);
+  updateScatterPlot(filteredCommits);
+  updateSelection([]);      // clear brush selection when time window changes
 }
+
+/* Attach slider + initialize everything with full data */
+document.getElementById("commit-progress")
+  .addEventListener("input", onTimeSliderChange);
+
+// first render (all commits)
+filteredCommits = commits.slice();
+updateFileDisplay(filteredCommits);
+updateSummary(filteredCommits);
+updateScatterPlot(filteredCommits);
+updateSelection([]);
+onTimeSliderChange();   // also sets the timestamp text correctly

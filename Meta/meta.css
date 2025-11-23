@@ -6,34 +6,75 @@
   --grid: #e5e7eb;
 }
 
-/* -------- Files by LOC list (Step 2) -------- */
-
-#files-section h2 {
-  margin-bottom: 0.5rem;
+/* -------- Slider row at the very top -------- */
+.time-filter {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.5rem 0 1.5rem;
 }
 
-.files-grid {
-  /* dl#files */
-  display: grid;
-  grid-template-columns: 1fr auto;
-  row-gap: 0.3rem;
-  column-gap: 2rem;
-  margin: 0 0 1.5rem 0;
-  font-family: monospace;
-  font-size: 0.9rem;
+.time-filter label {
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-.files-grid dt {
-  margin: 0;
+.time-filter input[type="range"] {
+  flex: 1;
 }
 
-.files-grid dd {
-  margin: 0;
-  text-align: right;
+.time-filter time {
+  margin-left: auto;
+  font-size: .9rem;
   color: var(--muted);
 }
 
-/* -------- Summary bar like your reference -------- */
+/* -------- Files by LOC unit viz -------- */
+.files-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 1.75rem;
+  row-gap: .75rem;
+  margin-bottom: 2rem;
+}
+
+/* we render each file as a “row” but use display: contents so
+   dt / dd participate directly in the grid */
+.files-grid .file {
+  display: contents;
+}
+
+.files-grid dt {
+  font-family: monospace;
+  font-size: .9rem;
+}
+
+.files-grid dt small {
+  display: block;
+  font-size: .75rem;
+  opacity: .7;
+}
+
+/* each <dd> is the container of many dots (one per line) */
+.files-grid dd {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: .15em;
+  padding-top: .4rem;
+}
+
+/* one dot per line of code */
+.loc {
+  width: 0.5em;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--loc-color, steelblue);
+}
+
+/* -------- Summary bar (single row) -------- */
 .summary-bar {
   display: grid;
   grid-template-columns: repeat(6, minmax(120px, 1fr));
@@ -45,8 +86,8 @@
 }
 
 .summary-bar .stat .k {
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  font-size: .72rem;
+  letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--muted);
   display: block;
@@ -59,36 +100,12 @@
   line-height: 1;
 }
 
-/* Responsive summary */
+/* collapse to 3 columns on narrow screens */
 @media (max-width: 960px) {
-  .summary-bar {
-    grid-template-columns: repeat(3, minmax(120px, 1fr));
-  }
+  .summary-bar { grid-template-columns: repeat(3, minmax(120px, 1fr)); }
 }
 
-/* -------- Time slider strip -------- */
-.time-filter {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin: 0.75rem 0 1rem 0;
-}
-
-.time-filter label {
-  font-weight: 600;
-}
-
-.time-filter input[type="range"] {
-  flex: 1;
-}
-
-.time-filter time {
-  margin-left: auto;
-  font-size: 0.9rem;
-  color: var(--muted);
-}
-
-/* -------- Chart card -------- */
+/* -------- Chart card: always white, with hidden overflow -------- */
 .chart-card {
   display: inline-block;
   background: #fff !important;
@@ -99,18 +116,24 @@
   overflow: hidden;
 }
 
-/* Axes visible in both themes */
+/* Axes dark so they’re visible in dark mode too */
 #scatter .axis path,
 #scatter .axis line { stroke:#111; }
 
 #scatter .x.axis text,
-#scatter .y.axis text {
-  fill:#111;
-  font-size:0.8rem;
-}
+#scatter .y.axis text { fill:#111; font-size:.8rem; }
 
 /* Light grid on the white card */
 #scatter .grid line { stroke: var(--grid); }
+
+/* Base dot look */
+#scatter .dot {
+  fill: var(--accent);
+  stroke: rgba(0,0,0,.25);
+  stroke-width: .5px;
+  fill-opacity: .6;
+  transition: r 300ms, cx 300ms, cy 300ms, fill-opacity 200ms;
+}
 
 /* Tooltip */
 #tooltip {
@@ -122,15 +145,14 @@
   border-radius:6px;
   padding:6px 8px;
   box-shadow:0 4px 12px rgba(0,0,0,.12);
-  font-size:0.85rem;
+  font-size:.85rem;
   max-width: 280px;
   z-index: 20;
 }
 
-/* Chart look */
+/* Additional axis / grid tweaks for dark mode */
 #scatter { background: none; }
 
-/* grid + axes in light / dark */
 .grid line { stroke: #e7ebf0; }
 .axis path, .axis line { stroke: #cfd6df; }
 .axis text { fill: #222; }
@@ -140,27 +162,11 @@ html[data-theme="dark"] .axis path,
 html[data-theme="dark"] .axis line { stroke: #3a4049; }
 html[data-theme="dark"] .axis text { fill: #e8eaed; }
 
-/* dots: theme blue; selected = red */
-.dots circle {
-  fill: #4f79ff;
-  fill-opacity: 0.6;
-  stroke: rgba(0,0,0,.25);
-  stroke-width: 0.5px;
-  transition: 150ms transform, 150ms fill-opacity;
-  transform-box: fill-box;
-  transform-origin: center;
-}
+/* container for circles – used by D3 */
+.dots circle:hover { transform: scale(1.2); fill-opacity: 1; }
 
-.dots circle:hover {
-  transform: scale(1.2);
-  fill-opacity: 1;
-}
-
-.dots circle.selected {
-  fill: #ff6b6b;
-}
-
-/* Force red fill for selected dots */
+/* Selected (brushed) = red */
+.dots circle.selected,
 .dot[fill="#ff6b6b"],
 .dots circle[fill="#ff6b6b"] {
   fill: #ff6b6b !important;
@@ -171,31 +177,12 @@ html[data-theme="dark"] .axis text { fill: #e8eaed; }
   stroke-width: 1;
 }
 
-/* Smooth radius / position transitions */
-.dot {
-  transition: r 300ms, cx 300ms, cy 300ms, fill-opacity 200ms;
-}
-
-.dot {
-  @starting-style {
-    r: 0;
-  }
-}
-
-/* Language breakdown list */
+/* nice compact stat list under chart */
 .stats {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 0.4rem 1rem;
-  margin-top: 0.5rem;
+  gap: .4rem 1rem;
+  margin-top: .5rem;
 }
-
-.stats dt {
-  opacity: 0.7;
-  font-variant: all-small-caps;
-  letter-spacing: 0.03em;
-}
-
-.stats dd {
-  margin: 0;
-}
+.stats dt { opacity:.7; font-variant: all-small-caps; letter-spacing:.03em; }
+.stats dd { margin:0; }

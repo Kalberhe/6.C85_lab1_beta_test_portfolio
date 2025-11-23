@@ -12,35 +12,36 @@
 
 <body>
   <main class="container">
-
     <h1>Meta</h1>
 
-    <!-- FILES BY LOC (STEP 2) -->
+    <!-- Time slider controls EVERYTHING (files + summary + scatter) -->
+    <section id="time-section">
+      <div id="time-filter" class="time-filter">
+        <label for="commit-progress">Show commits until:</label>
+        <input type="range" id="commit-progress" min="0" max="100" value="100">
+        <time id="commit-time">---</time>
+      </div>
+    </section>
+
+    <!-- Files by LOC unit visualization -->
     <section id="files-section">
       <h2>Files by Lines of Code</h2>
-      <!-- dl so we can do name + count on one line via CSS grid -->
       <dl id="files" class="files-grid"></dl>
     </section>
 
-    <!-- SUMMARY -->
+    <!-- Sliding summary (updates with slider) -->
     <section id="summary">
       <h2>Summary</h2>
       <div id="stats" class="summary-bar"></div>
     </section>
 
-    <!-- SCATTER CHART -->
+    <!-- Scatter chart -->
     <section id="viz">
       <h2>Commits by Date &amp; Hour</h2>
 
-      <div id="time-filter" class="time-filter">
-        <label for="commit-progress">Show commits until:</label>
-        <input type="range" id="commit-progress" min="0" max="100" value="100" />
-        <time id="commit-time">---</time>
-      </div>
-
       <div class="chart-card">
-        <svg id="scatter" width="900" height="420"
-             role="img" aria-label="Commits by date and hour"></svg>
+        <svg id="scatter" width="900" height="420" role="img"
+             aria-label="Commits by date and hour"></svg>
 
         <p id="selection-count">No commits selected</p>
         <dl id="language-breakdown" class="stats"></dl>
@@ -48,7 +49,6 @@
 
       <div id="tooltip" hidden></div>
     </section>
-
   </main>
 
   <script type="module" src="meta.js"></script>
