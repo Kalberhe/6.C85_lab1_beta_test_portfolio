@@ -7,7 +7,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="../style.css" />
   <link rel="stylesheet" href="meta.css" />
-  <script type="module" src="https://cdn.jsdelivr.net/npm/d3@7/+esm"></script>
 </head>
 
 <body>
@@ -18,36 +17,49 @@
     <section id="time-section">
       <div id="time-filter" class="time-filter">
         <label for="commit-progress">Show commits until:</label>
-        <input type="range" id="commit-progress" min="0" max="100" value="100">
+        <input type="range" id="commit-progress" min="0" max="100" value="100" />
         <time id="commit-time">---</time>
       </div>
     </section>
 
-    <!-- Files by LOC unit visualization -->
-    <section id="files-section">
-      <h2>Files by Lines of Code</h2>
-      <dl id="files" class="files-grid"></dl>
-    </section>
-
-    <!-- Sliding summary (updates with slider) -->
+    <!-- Sliding summary (updates with slider / scrolly) -->
     <section id="summary">
       <h2>Summary</h2>
       <div id="stats" class="summary-bar"></div>
     </section>
 
-    <!-- Scatter chart -->
+    <!-- Scrollytelling: story left, sticky scatter right -->
     <section id="viz">
       <h2>Commits by Date &amp; Hour</h2>
 
-      <div class="chart-card">
-        <svg id="scatter" width="900" height="420" role="img"
-             aria-label="Commits by date and hour"></svg>
+      <div id="scrolly-1">
+        <div id="scatter-story">
+          <!-- steps are injected by meta.js -->
+        </div>
 
-        <p id="selection-count">No commits selected</p>
-        <dl id="language-breakdown" class="stats"></dl>
+        <div id="scatter-plot">
+          <div class="chart-card">
+            <svg
+              id="scatter"
+              width="900"
+              height="420"
+              role="img"
+              aria-label="Commits by date and hour">
+            </svg>
+
+            <p id="selection-count">No commits selected</p>
+            <dl id="language-breakdown" class="stats"></dl>
+          </div>
+        </div>
       </div>
 
       <div id="tooltip" hidden></div>
+    </section>
+
+    <!-- Files by LOC unit  -->
+    <section id="files-section">
+      <h2>Files by Lines of Code</h2>
+      <dl id="files" class="files-grid"></dl>
     </section>
   </main>
 

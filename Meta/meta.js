@@ -1,7 +1,8 @@
+import scrollama from "https://cdn.jsdelivr.net/npm/scrollama@3.2.0/+esm";
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 /* ---- Sizing ---- */
-const W = 900, H = 420, M = { t:30, r:28, b:44, l:56 };
+const W = 900, H = 420, M = { t: 30, r: 28, b: 44, l: 56 };
 const innerW = W - M.l - M.r, innerH = H - M.t - M.b;
 
 /* ---- SVG ---- */
@@ -26,7 +27,7 @@ const fmtTimeLong = d3.timeFormat("%b %d, %Y %I:%M %p");
 function themeAccent() {
   const v = getComputedStyle(document.documentElement)
     .getPropertyValue("--accent");
-  return (v && v.trim()) || "#4f79ff";
+  return (v && v.trim()) || "#2563eb";
 }
 const ACCENT = themeAccent();
 const SELECTED = "#ff6b6b";
@@ -60,8 +61,8 @@ const commits = d3.rollups(
   },
   d => d.commit
 )
-.map(d => d[1])
-.sort((a, b) => d3.ascending(a.when, b.when));
+  .map(d => d[1])
+  .sort((a, b) => d3.ascending(a.when, b.when));
 
 /* --- Slider state (0–100 mapped across full time range) --- */
 let commitProgress = 100;
@@ -71,7 +72,7 @@ const timeScale = d3.scaleTime()
   .range([0, 100]);
 
 let commitMaxTime = timeScale.invert(commitProgress);
-let filteredCommits = commits.slice();   // start with all
+let filteredCommits = commits.slice();   // current subset
 
 /* ---- Scales & axes for scatter ---- */
 const x = d3.scaleTime()
@@ -189,7 +190,7 @@ function updateFileDisplay(subset) {
   merged.select("dt")
     .html(d => `<code>${d.name}</code><small>${d.lines.length} lines</small>`);
 
-  // one dot per line
+  // one dot per line, correctly colored
   merged.select("dd")
     .selectAll("div.loc")
     .data(d => d.lines)
@@ -197,7 +198,9 @@ function updateFileDisplay(subset) {
       .attr("class", "loc")
       .attr("style", d => {
         const t = d.type || d.language || d.ext || "other";
-        return `--loc-color:${colors(t)}`;
+        const color = colors(t);
+        // IMPORTANT: full CSS declaration so variable + fallback work
+        return `--loc-color: ${color}; background: var(--loc-color);`;
       });
 }
 
@@ -205,8 +208,11 @@ function updateFileDisplay(subset) {
 
 function updateScatterPlot(dataNow) {
 
-  // Update x-domain to current window
-  x.domain(d3.extent(dataNow, d => d.when));
+  if (!dataNow.length) {
+    x.domain(d3.extent(commits, d => d.when));
+  } else {
+    x.domain(d3.extent(dataNow, d => d.when));
+  }
   svg.select(".x.axis").call(d3.axisBottom(x));
 
   const sorted = d3.sort(dataNow, d => -d.linesTouched);
@@ -281,7 +287,7 @@ function updateSelection(picked) {
     .attr("fill", d => pickedSet.has(d.commit) ? SELECTED : ACCENT)
     .attr("fill-opacity", d => pickedSet.has(d.commit) ? 1 : 0.25)
     .attr("stroke", d => pickedSet.has(d.commit) ? "#000" : null)
-    .attr("stroke-width", d => pickedSet.has(d.commit) ? 1 : null);
+    .attr("stroke-width", d => pickedSet.has(d.commit) ? 1 : 0);
 
   const count = picked.length;
   d3.select("#selection-count")
@@ -313,37 +319,99 @@ function updateSelection(picked) {
   });
 }
 
-/* ---------- Slider callback (central controller) ---------- */
+/* ---------- Central time filter (used by slider + scrolly) ---------- */
 
-function onTimeSliderChange() {
+function applyTimeFilter(maxDate) {
+  commitMaxTime = maxDate;
+  commitProgress = timeScale(maxDate);
+
   const slider = document.getElementById("commit-progress");
-  commitProgress = +slider.value;
+  if (slider) slider.value = commitProgress;
 
-  commitMaxTime = timeScale.invert(commitProgress);
-
-  document.getElementById("commit-time").textContent =
-    commitMaxTime.toLocaleString(undefined, {
+  const timeEl = document.getElementById("commit-time");
+  if (timeEl) {
+    timeEl.textContent = maxDate.toLocaleString(undefined, {
       dateStyle: "long",
       timeStyle: "short"
     });
+  }
 
   filteredCommits = commits.filter(d => d.when <= commitMaxTime);
 
-  // keep everything in sync with the filtered subset
   updateFileDisplay(filteredCommits);
   updateSummary(filteredCommits);
   updateScatterPlot(filteredCommits);
-  updateSelection([]);      // clear brush selection when time window changes
+  updateSelection([]);   // clear brush selection when window changes
 }
 
-/* Attach slider + initialize everything with full data */
+/* Slider callback */
+function onTimeSliderChange() {
+  const slider = document.getElementById("commit-progress");
+  if (!slider) return;
+  const val = +slider.value;
+  const date = timeScale.invert(val);
+  applyTimeFilter(date);
+}
+
+/* Attach slider */
 document.getElementById("commit-progress")
   .addEventListener("input", onTimeSliderChange);
 
-// first render (all commits)
-filteredCommits = commits.slice();
-updateFileDisplay(filteredCommits);
-updateSummary(filteredCommits);
-updateScatterPlot(filteredCommits);
-updateSelection([]);
-onTimeSliderChange();   // also sets the timestamp text correctly
+/* ---------- Step 3.2: Generate scrolly text for each commit ---------- */
+
+d3.select("#scatter-story")
+  .selectAll(".step")
+  .data(commits)
+  .join("div")
+    .attr("class", "step")
+    .html((d, i) => {
+      const whenStr = d.when.toLocaleString("en", {
+        dateStyle: "full",
+        timeStyle: "short"
+      });
+      const totalLines = d.lines.length;
+      const nFiles = d3.rollups(
+        d.lines,
+        v => v.length,
+        r => r.file
+      ).length;
+
+      return `
+        <p>On <strong>${whenStr}</strong>, I made ${
+          i === 0 ? "my first commit in this repo" : "another glorious commit"
+        }.</p>
+        <p>It touched <strong>${fmtInt(totalLines)}</strong> lines across
+        <strong>${nFiles}</strong> files.</p>
+        <p>Scrolling through these commits lets you see how the activity
+        in this repo evolved over time.</p>
+      `;
+    });
+
+/* ---------- Step 3.3: Scrollama wiring ---------- */
+
+function onStepEnter(response) {
+  // highlight active step
+  d3.selectAll("#scatter-story .step").classed("is-active", false);
+  d3.select(response.element).classed("is-active", true);
+
+  const d = response.element.__data__;
+  if (!d || !(d.when instanceof Date)) return;
+
+  // When this step hits the midpoint, filter everything up to that commit's time
+  applyTimeFilter(d.when);
+}
+
+const scroller = scrollama();
+scroller
+  .setup({
+    container: "#scrolly-1",
+    step: "#scrolly-1 .step",
+    offset: 0.5
+  })
+  .onStepEnter(onStepEnter);
+
+window.addEventListener("resize", () => scroller.resize());
+
+/* ---------- Initial render (all commits, slider at end) ---------- */
+const maxDate = d3.max(commits, d => d.when);
+applyTimeFilter(maxDate);
