@@ -2,7 +2,7 @@
 console.log("IT’S ALIVE!");
 
 // ---------- Paths (GitHub Pages vs local) ----------
-const REPO = "6.C85_lab1_beta_test_portfolio";
+const REPO = "Portfolio";
 const IS_LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
 const BASE = IS_LOCAL ? "/" : `/${REPO}/`;
 
