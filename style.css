@@ -356,7 +356,7 @@ main.projects-wrap {
 .projects-title { margin: .5rem 0 .25rem !important; text-align: center; }
 .pie-flex { margin-bottom: .5rem !important; }
 
-/* Pie + legend visuals */
+/* Pie + legend visuals*/
 #projects-pie-plot { max-width: 22em; margin-block: 1rem 1.25rem; overflow: visible; }
 .pie-flex { display: flex; flex-wrap: wrap; align-items: center; gap: 1.25rem; }
 

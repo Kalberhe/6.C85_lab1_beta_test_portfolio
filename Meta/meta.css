@@ -100,7 +100,7 @@ html[data-theme="dark"] .axis text { fill: #e8eaed; }
   transform-origin: center;
 }
 .dots circle:hover { transform: scale(1.2); fill-opacity: 1; }
-.dots circle.selected { fill: #ff6b6b; }  /* red when brushed */
+.dots circle.selected { fill: #ff6b6b; }  /* red when brushed*/
 
 /* nice compact stat list */
 .stats {
