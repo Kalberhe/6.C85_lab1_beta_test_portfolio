@@ -1,12 +1,19 @@
 // global.js — load on every page with type="module"
-console.log("IT’S ALIVE!");
+console.log("global.js loaded");
 
-// ---------- Paths (GitHub Pages vs local) ----------
+// ---------- Correct base path handling for GitHub Pages ----------
 const REPO = "Portfolio";
-const IS_LOCAL = ["localhost", "127.0.0.1"].includes(location.hostname);
+
+// TRUE when running on local machine (VS Code Live Server, local file, localhost)
+const IS_LOCAL =
+  location.hostname === "localhost" ||
+  location.hostname === "127.0.0.1" ||
+  location.protocol === "file:";
+
+// BASE is "/" locally, but "/Portfolio/" on GitHub Pages
 const BASE = IS_LOCAL ? "/" : `/${REPO}/`;
 
-// ---------- Nav pages (Meta included) ----------
+// ---------- Pages used in navbar ----------
 const pages = [
   { url: "",          title: "Home" },
   { url: "projects/", title: "Projects" },
@@ -16,33 +23,38 @@ const pages = [
   { url: "https://github.com/Kalberhe", title: "GitHub", external: true },
 ];
 
-// ---------- Build navbar (no inline styles; let your CSS handle the look) ----------
+// ---------- Build the navbar ----------
 const nav = document.createElement("nav");
 document.body.prepend(nav);
 
 for (const p of pages) {
+  // Full URL
   const href = p.url.startsWith("http") ? p.url : BASE + p.url;
+
   const a = document.createElement("a");
   a.href = href;
   a.textContent = p.title;
 
-  // External links in a new tab
+  // External links → new tab
   if (p.external || new URL(href, location.href).host !== location.host) {
     a.target = "_blank";
     a.rel = "noopener";
   }
 
-  // Highlight current page
-  const linkPath = new URL(a.href, location.href).pathname.replace(/\/+$/, "");
-  const herePath = location.pathname.replace(/\/+$/, "");
-  if (a.host === location.host && linkPath === herePath) {
+  // ---------- Highlight current page ----------
+  // Normalize paths (“/Portfolio/projects” → “/Portfolio/projects/”)
+  const linkPath = new URL(a.href, location.href).pathname.replace(/\/+$/, "/");
+  const herePath = location.pathname.replace(/\/+$/, "/");
+
+  // Both on same domain & same path
+  if (!p.external && linkPath === herePath) {
     a.classList.add("current");
   }
 
   nav.append(a);
 }
 
-// ---------- Theme switcher (id="theme" — matches your CSS/markup expectations) ----------
+// ---------- Theme switcher ----------
 document.body.insertAdjacentHTML(
   "afterbegin",
   `
@@ -58,11 +70,8 @@ document.body.insertAdjacentHTML(
 
 const select = document.querySelector("#theme");
 
-// Apply theme using data-theme (your CSS can target [data-theme="dark"] / [data-theme="light"])
-// Automatic removes the attribute so prefers-color-scheme works.
 function applyTheme(mode) {
   const html = document.documentElement;
-
   if (mode === "light") {
     html.setAttribute("data-theme", "light");
     html.style.colorScheme = "light";
@@ -70,14 +79,14 @@ function applyTheme(mode) {
     html.setAttribute("data-theme", "dark");
     html.style.colorScheme = "dark";
   } else {
-    // Automatic = match OS
+    // Auto → match OS
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     html.setAttribute("data-theme", prefersDark ? "dark" : "light");
     html.style.colorScheme = prefersDark ? "dark" : "light";
   }
 }
 
-// Initialize theme
+// Initial theme
 const saved = localStorage.getItem("colorScheme") || "auto";
 select.value = saved;
 applyTheme(saved);
@@ -89,17 +98,17 @@ select.addEventListener("input", (e) => {
   applyTheme(mode);
 });
 
-// Listen to OS changes if set to auto
+// Listen to OS theme if auto
 if (window.matchMedia) {
-  const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  mq.addEventListener("change", () => {
-    if ((localStorage.getItem("colorScheme") || "auto") === "auto") {
-      applyTheme("auto");
-    }
-  });
+  window.matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", () => {
+      if ((localStorage.getItem("colorScheme") || "auto") === "auto") {
+        applyTheme("auto");
+      }
+    });
 }
 
-// ---------- Optional helpers you already use ----------
+// ---------- helper functions ----------
 export async function fetchJSON(url) {
   try {
     const res = await fetch(url);
@@ -138,6 +147,7 @@ export function renderProjects(projects, container, headingLevel = "h2") {
       <p>${p.description}</p>
       ${buttons}
     `;
+
     container.appendChild(article);
   }
 }
