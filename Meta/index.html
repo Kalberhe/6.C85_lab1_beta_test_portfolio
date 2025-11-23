@@ -22,6 +22,15 @@
     <!-- Scatter -->
     <section id="viz">
       <h2>Commits by Date &amp; Hour</h2>
+      <div id="time-filter" style="margin-bottom: 1rem; display:flex; align-items:center; gap:1rem;">
+  <label for="commit-progress" style="font-weight:600;">Show commits until:</label>
+
+  <input type="range" id="commit-progress" min="0" max="100" value="100" style="flex:1;">
+
+  <time id="commit-time" style="margin-left:auto; font-size:.9rem; color:var(--muted);">
+    ---
+  </time>
+</div>
       <div class="chart-card">
         <svg id="scatter" width="900" height="420" role="img" aria-label="Commits by date and hour"></svg>
         <p id="selection-count">No commits selected</p>

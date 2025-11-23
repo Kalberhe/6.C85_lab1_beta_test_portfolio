@@ -94,7 +94,7 @@ html[data-theme="dark"] .axis text { fill: #e8eaed; }
 /* dots: theme blue; selected = red */
 .dots circle {
   fill: #4f79ff;           /* theme blue */
-  fill-opacity: .9;
+  fill-opacity: .6;
   transition: 150ms transform, 150ms fill-opacity;
   transform-box: fill-box;
   transform-origin: center;
@@ -121,4 +121,13 @@ html[data-theme="dark"] .axis text { fill: #e8eaed; }
 .dot[fill="#ff6b6b"] {
   stroke: #000;
   stroke-width: 1;
+}
+.dot {
+  transition: r 300ms, cx 300ms, cy 300ms, fill-opacity 200ms;
+}
+
+.dot {
+  @starting-style {
+    r: 0;
+  }
 }
