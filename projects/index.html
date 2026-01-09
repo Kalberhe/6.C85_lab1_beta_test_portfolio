@@ -2,39 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Projects – Kalkidan Berhe Gebrekirstos</title>
-  <link rel="stylesheet" href="../style.css?v=12">
-  <!-- global utilities (renders the site navbar) -->
-  <script type="module" src="./projects.js?v=12"></script>
+  <title>Projects | Kalkidan</title>
+  <link rel="stylesheet" href="../style.css?v=fun">
+  <script type="module" src="../global.js"></script>
 </head>
 <body>
-  <!-- Do NOT add a <nav> here; global.js injects it -->
+  <main class="container">
+    <h1 style="margin-top:2rem; text-align:center; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2);">My Projects</h1>
+    
+    <input class="search-bar" type="search" placeholder="✨ Search projects (e.g., 'Python', 'ML', '2025')..." />
 
-  <main class="projects-wrap">
-    <!-- 1) Title -->
-    <h1 class="projects-title">My Projects</h1>
-
-    <!-- 2) Pie + Legend -->
-    <div class="pie-flex">
-      <svg id="projects-pie-plot" viewBox="-50 -50 100 100" aria-label="Projects per year"></svg>
-      <ul class="legend" aria-label="Year legend"></ul>
-    </div>
-
-    <!-- 3) Search -->
-    <input
-      class="searchBar"
-      type="search"
-      aria-label="Search projects"
-      placeholder="🔍 Search projects…"
-    />
-
-    <!-- 4) Project cards (filled by JS) -->
-    <div class="projects">
-      <noscript>Please enable JavaScript to see projects.</noscript>
-    </div>
+    <div id="projects-list" class="project-grid"></div>
   </main>
-
-  <!-- Page script -->
-  <script type="module" src="./projects.js"></script>
+  
+  <script type="module" src="projects.js"></script>
 </body>
 </html>
