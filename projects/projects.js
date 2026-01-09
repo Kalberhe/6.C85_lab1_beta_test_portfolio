@@ -2,7 +2,7 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 import { fetchJSON } from "../global.js";
 
-/* ---------- Card template (with placeholder image) ---------- */
+/* ---------- Card template ---------- */
 function cardHTML(p, heading = "h2") {
   const imgTag = p.image
     ? `<img src="${p.image}" alt="${p.title}">`
@@ -17,8 +17,8 @@ function cardHTML(p, heading = "h2") {
       <${heading}>${p.title}</${heading}>
       ${imgTag}
       <p>${p.description ?? ""}</p>
-      ${links}
-      ${p.year ? `<p class="year" aria-label="Project year">${p.year}</p>` : ""}
+      <div class="links">${links}</div>
+      ${p.year ? `<p class="year" style="font-size:0.85em; margin-top:0.5em;">${p.year}</p>` : ""}
     </article>
   `;
 }
@@ -33,218 +33,136 @@ const titleEl = document.querySelector('.projects-title');
 /* ---------- Global state ---------- */
 let allProjects = [];
 let query = '';
-let selectedYear = null;   // persistent via click
-let hoveredIndex = -1;     // index of hovered slice/legend item
-let hoveredYear = null;    // year to preview on hover
-let lastPieData = [];      // current pie's [{label, value}] for class updates
+let selectedYear = null; 
 
-/* ---------- D3 generators ---------- */
-const colors  = d3.scaleOrdinal(d3.schemeTableau10);
-const arcGen  = d3.arc().innerRadius(0).outerRadius(50);
+/* ---------- D3 Configuration ---------- */
+const colors = d3.scaleOrdinal(d3.schemeTableau10);
+const arcGen = d3.arc().innerRadius(0).outerRadius(50);
 const sliceGen = d3.pie().value(d => d.value);
 
-/* ---------- Helpers ---------- */
-function toYearCounts(projects) {
+function renderPieChart(projects) {
+  // 1. Calculate data
   const rolled = d3.rollups(projects, v => v.length, d => String(d.year ?? 'Unknown'));
-  rolled.sort((a, b) => b[0].localeCompare(a[0])); // newest first
-  return rolled.map(([year, count]) => ({ label: year, value: count }));
-}
+  const data = rolled.map(([year, count]) => ({ label: year, value: count }))
+                     .sort((a, b) => b.label.localeCompare(a.label));
 
-function clearViz() {
-  svg.selectAll('path').remove();
-  legend.selectAll('li').remove();
-}
+  const arcData = sliceGen(data);
+  const arcs = svg.selectAll('path').data(arcData, d => d.data.label);
 
-function renderList(projects) {
-  projectsContainer.innerHTML = projects.length
-    ? projects.map(p => cardHTML(p, "h3")).join("")
-    : `<p class="muted">No projects match your filters.</p>`;
-  if (titleEl) titleEl.textContent = `My Projects (${projects.length})`;
-}
+  // 2. Animate Exits (Old slices fade out)
+  arcs.exit()
+    .transition().duration(500)
+    .attrTween('d', function(d) {
+      const i = d3.interpolate(d.startAngle, d.endAngle);
+      return t => { d.startAngle = i(t); return arcGen(d); };
+    })
+    .remove();
 
-function clsSlice(i, data) {
-  const yr = data[i].label;
-  const isSel = (selectedYear !== null && yr === selectedYear);
-  const isHov = (hoveredIndex === i);
-  return `${isSel ? 'selected' : ''} ${isHov ? 'hovered' : ''}`.trim();
-}
-function clsLegend(i, data) {
-  const yr = data[i].label;
-  const isSel = (selectedYear !== null && yr === selectedYear);
-  const isHov = (hoveredIndex === i);
-  return `${isSel ? 'selected' : ''} ${isHov ? 'hovered' : ''}`.trim();
-}
+  // 3. Animate Updates (Existing slices resize)
+  arcs.transition().duration(500)
+    .attrTween('d', function(d) {
+      const i = d3.interpolate(this._current || d, d);
+      this._current = i(0);
+      return t => arcGen(i(t));
+    });
 
-/* Update classes only (don’t rebuild DOM) */
-function updateHoverClasses() {
+  // 4. Animate Entries (New slices grow in)
+  arcs.enter().append('path')
+    .attr('fill', (d, i) => colors(i))
+    .attr('class', d => d.data.label === selectedYear ? 'selected' : '')
+    .each(function(d) { this._current = d; }) // Store initial angles
+    .transition().duration(500)
+    .attrTween('d', function(d) {
+      const i = d3.interpolate(d.startAngle, d.endAngle);
+      return t => { d.endAngle = d.startAngle + i(t); return arcGen(d); }; // Grow effect
+    });
+
+  // 5. Re-attach events to all paths (new and old)
   svg.selectAll('path')
-    .attr('class', function () {
-      const bound = d3.select(this).datum(); // { d, i }
-      return clsSlice(bound.i, lastPieData);
-    });
-
-  legend.selectAll('li')
-    .attr('class', function () {
-      const d = d3.select(this).datum(); // { label, value, i }
-      return clsLegend(d.i, lastPieData);
-    });
-}
-
-/* Render pie & legend from persistent dataset (search + selectedYear) */
-function renderPieChart(projectsForPie) {
-  clearViz();
-
-  lastPieData = toYearCounts(projectsForPie);
-  if (lastPieData.length === 0) return;
-
-  const arcData = sliceGen(lastPieData);
-  const arcs = arcData.map(d => arcGen(d));
-
-  // PIE
-  svg.selectAll('path')
-    .data(arcs.map((d, i) => ({ d, i })))
-    .enter().append('path')
-    .attr('d', d => d.d)
-    .attr('fill', d => colors(d.i))
-    .attr('class', d => clsSlice(d.i, lastPieData))
-    .on('pointerenter', (_, item) => {
-      hoveredIndex = item.i;
-      hoveredYear  = lastPieData[item.i].label;
-      renderList(computeFilteredCards());   // update cards only
-      updateHoverClasses();                 // just update classes
-    })
-    .on('pointerleave', () => {
-      hoveredIndex = -1;
-      hoveredYear  = null;
-      renderList(computeFilteredCards());
-      updateHoverClasses();
-    })
-    .on('click', (_, item) => {
-      const y = lastPieData[item.i].label;
-      selectedYear = (selectedYear === y) ? null : y;
-      syncAndRender(true);                  // persistent change → rebuild pie
-    });
-
-  // LEGEND
-  legend.selectAll('li')
-    .data(lastPieData.map((d, i) => ({ ...d, i })))
-    .enter().append('li')
-    .attr('style', d => `--color:${colors(d.i)}`)
-    .attr('class', d => clsLegend(d.i, lastPieData))
-    .html(d => `<span class="swatch"></span> ${d.label} <em>(${d.value})</em>`)
-    .on('pointerenter', (_, d) => {
-      hoveredIndex = d.i;
-      hoveredYear  = d.label;
-      renderList(computeFilteredCards());
-      updateHoverClasses();
-    })
-    .on('pointerleave', () => {
-      hoveredIndex = -1;
-      hoveredYear  = null;
-      renderList(computeFilteredCards());
-      updateHoverClasses();
-    })
     .on('click', (_, d) => {
-      selectedYear = (selectedYear === d.label) ? null : d.label;
-      syncAndRender(true);
-    })
-    .attr('role', 'button')
-    .attr('tabindex', '0')
-    .on('keydown', (ev, d) => {
-      if (ev.key === 'Enter' || ev.key === ' ') {
-        ev.preventDefault();
-        selectedYear = (selectedYear === d.label) ? null : d.label;
-        syncAndRender(true);
-      }
+      selectedYear = selectedYear === d.data.label ? null : d.data.label;
+      
+      // Update styling without full re-render
+      svg.selectAll('path').attr('class', p => p.data.label === selectedYear ? 'selected' : '');
+      legend.selectAll('li').attr('class', p => p.label === selectedYear ? 'selected' : '');
+      
+      renderList(allProjects); // Filter cards
     });
-}
 
-/* --------- Combined filters ---------- */
-/* Cards use: search + (hoveredYear ?? selectedYear)  */
-function computeFilteredCards() {
-  let filtered = allProjects;
-
-  if (query.trim() !== '') {
-    const q = query.toLowerCase();
-    filtered = filtered.filter(p => {
-      const values = Object.values(p).join('\n').toLowerCase();
-      return values.includes(q);
+  // 6. Render Legend
+  const legItems = legend.selectAll('li').data(data, d => d.label);
+  
+  legItems.exit().remove();
+  
+  const newLeg = legItems.enter().append('li')
+    .attr('class', d => d.label === selectedYear ? 'selected' : '')
+    .on('click', (_, d) => {
+      selectedYear = selectedYear === d.label ? null : d.label;
+      svg.selectAll('path').attr('class', p => p.data.label === selectedYear ? 'selected' : '');
+      legend.selectAll('li').attr('class', p => p.label === selectedYear ? 'selected' : '');
+      renderList(allProjects);
     });
-  }
 
-  const yearToUse = (hoveredYear !== null ? hoveredYear : selectedYear);
-  if (yearToUse !== null) {
-    filtered = filtered.filter(p => String(p.year ?? 'Unknown') === String(yearToUse));
-  }
-
-  return filtered;
-}
-
-/* Pie uses: search + selectedYear (NO hover) → stable DOM so pointerleave fires */
-function computeProjectsForPie() {
-  let filtered = allProjects;
-
-  if (query.trim() !== '') {
-    const q = query.toLowerCase();
-    filtered = filtered.filter(p => {
-      const values = Object.values(p).join('\n').toLowerCase();
-      return values.includes(q);
-    });
-  }
-
-  if (selectedYear !== null) {
-    filtered = filtered.filter(p => String(p.year ?? 'Unknown') === String(selectedYear));
-  }
-
-  return filtered;
-}
-
-/* ---------- Sync + render ---------- */
-function syncAndRender(rebuildPie = true) {
-  // Always refresh cards for current hover/selection/search
-  renderList(computeFilteredCards());
-
-  // Only rebuild pie for persistent changes (search or click), not hover
-  if (rebuildPie) {
-    renderPieChart(computeProjectsForPie());
-  } else {
-    updateHoverClasses();
-  }
-}
-
-/* ---------- Events ---------- */
-if (searchInput) {
-  searchInput.addEventListener('input', (ev) => {
-    query = ev.target.value;
-    syncAndRender(true);  // persistent change
+  newLeg.append('span')
+    .className('swatch')
+    .style('background-color', (d, i) => colors(i));
+    
+  newLeg.append('span')
+    .className('text') // Placeholder for text, filled below
+    
+  // Update text for all legend items
+  legend.selectAll('li').select('span.swatch').style('background-color', (d, i) => colors(i));
+  legend.selectAll('li').each(function(d) {
+    const el = d3.select(this);
+    if(el.select('.label-text').empty()) el.append('span').attr('class', 'label-text');
+    el.select('.label-text').html(` ${d.label} <em>(${d.value})</em>`);
   });
 }
 
-/* ---------- Init ---------- */
+function renderList(projects) {
+  // Filter Logic
+  let filtered = projects;
+  
+  // 1. Apply Search
+  if (query) {
+    filtered = filtered.filter(p => Object.values(p).join(' ').toLowerCase().includes(query.toLowerCase()));
+  }
+
+  // 2. Apply Year Filter
+  if (selectedYear) {
+    filtered = filtered.filter(p => String(p.year) === selectedYear);
+  }
+
+  // Render
+  projectsContainer.innerHTML = filtered.length
+    ? filtered.map(p => cardHTML(p, "h3")).join("")
+    : `<p class="muted">No projects found.</p>`;
+    
+  if (titleEl) titleEl.textContent = `My Projects (${filtered.length})`;
+}
+
+// Init
 (async function main() {
   const data = await fetchJSON("../lib/projects.json");
   allProjects = Array.isArray(data) ? data : [];
-
-  // 🔹 Add your Bikewatching project here
-  const bikewatchingProject = {
+  
+  // Add manual project example
+  allProjects.push({
     title: "Bikewatching",
-    year: 2025, // adjust if you want a different year bucket
-    image: "assets/bikewatching-thumb.png", // or remove/NULL to use placeholder
-    description:
-      "Interactive map of Boston-area bike lanes and BlueBike station traffic built with Mapbox GL JS and D3.",
-    links: [
-      {
-        href: "https://kalberhe.github.io/bikewatching/",
-        label: "Live demo",
-      },
-      {
-        href: "https://github.com/Kalberhe/bikewatching",
-        label: "Source code",
-      },
-    ],
-  };
+    year: 2025,
+    image: "https://via.placeholder.com/300x200?text=Map+Demo", // Placeholder
+    description: "Interactive map of Boston-area bike lanes and BlueBike station traffic.",
+    links: [{ href: "https://github.com/Kalberhe/bikewatching", label: "View Code" }]
+  });
 
-  allProjects.push(bikewatchingProject);
-
-  syncAndRender(true);
+  renderPieChart(allProjects);
+  renderList(allProjects);
+  
+  // Search Listener
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      query = e.target.value;
+      renderList(allProjects);
+    });
+  }
 })();

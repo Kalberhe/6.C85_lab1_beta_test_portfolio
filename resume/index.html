@@ -1,78 +1,77 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <script type="module" src="../global.js"></script>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Resume - Kalkidan Berhe Gebrekirstos</title>
-  <link rel="stylesheet" href="../style.css?v=3">
+  <title>Resume | Kalkidan</title>
+  <link rel="stylesheet" href="../style.css?v=2026">
+  <script type="module" src="../global.js"></script>
 </head>
 <body>
-  <header>
-    <h1>Resume</h1>
-    
-  </header>
+  <main class="container">
+    <div style="text-align:right; margin: 2rem 0;">
+      <a href="KBG26.pdf" target="_blank" class="btn" style="color:var(--accent); font-weight:bold; border:1px solid var(--border); padding:0.5rem 1rem; border-radius:8px; text-decoration:none;">Download PDF</a>
+    </div>
 
-  <main>
-    <!--  Local link -->
-    <p>
-      <a href="KBG08.pdf" target="_blank"> Download / Open Full Resume (PDF)</a>
-      &nbsp;|&nbsp;
-      <!-- 🔗 Raw GitHub fallback -->
-      <a href="https://raw.githubusercontent.com/kalberhe/6.C85_lab1_beta_test_portfolio/main/resume/KBG08.pdf" target="_blank">
-        🔗 Open PDF (Raw)
-      </a>
-    </p>
-
-    <!-- Resume content -->
-    <section>
+    <section class="resume-section">
       <h2>Education</h2>
-      <p><strong>University of California, San Diego</strong>, La Jolla, CA<br>
-      Bachelor of Science in Data Science, Minor in Economics<br>
-      <em>Sep. 2024 – June 2026</em></p>
+      <div class="job">
+        <div class="job-header">
+          <h3>University of California, San Diego</h3>
+          <span class="time">Expected June 2026</span>
+        </div>
+        <div class="role">B.S. Data Science, Minor in Economics</div>
+        <p style="color:var(--text-muted); margin-top:0.25rem;">La Jolla, CA</p>
+      </div>
     </section>
 
-    <section>
+    <section class="resume-section">
       <h2>Experience</h2>
-      <p><strong>Data Analytics Extern</strong>, Beats by Dre – Externship Program (Remote)<br>
-      <em>July 2025 – Present</em><br>
-      • Performed qualitative and quantitative analysis using Python and data visualization tools to uncover consumer trends.<br>
-      • Applied AI-powered sentiment analysis on social media and reviews to inform product development.<br>
-      • Conducted competitor benchmarking and market research.</p>
+      
+      <div class="job">
+        <div class="job-header">
+          <h3>Eclipse Analytics</h3>
+          <span class="time">Apr 2025 – Present</span>
+        </div>
+        <div class="role">Lead Project Manager, Sports Analytics</div>
+        <ul>
+          <li>Lead two analytics teams (6-8 analysts) conducting statistical modeling for basketball and football.</li>
+          <li>Analyze UCSD Women's Basketball practice data using visual tracking and spatial metrics.</li>
+          <li>Design player heat maps and visualizations for shooting efficiency and defensive impact.</li>
+        </ul>
+      </div>
 
-      <p><strong>Lead Project Manager, Sports Analytics</strong>, Eclipse Analytics (San Diego, CA)<br>
-      <em>April 2025 – Present</em><br>
-      • Oversees two research teams focusing on statistical modeling in professional basketball and football.<br>
-      • Guides direction, ensures actionable insights, and supports analyst team development.</p>
+      <div class="job">
+        <div class="job-header">
+          <h3>Beats by Dre</h3>
+          <span class="time">July 2025 – Oct 2025</span>
+        </div>
+        <div class="role">Data Analytics Extern</div>
+        <ul>
+          <li>Performed quantitative analysis on consumer and social media data using Python.</li>
+          <li>Applied NLP-based sentiment analysis to identify trends in product perception.</li>
+          <li>Conducted competitor benchmarking to support product positioning.</li>
+        </ul>
+      </div>
 
-      <p><strong>Coding Camp Organizer (Team Member)</strong>, Kikclub (Remote)<br>
-      <em>Oct 2024 – Mar 2025</em><br>
-      • Collaborated internationally to organize coding camps.<br>
-      • Evaluated feedback and improved curriculum using data analysis.</p>
-
-      <p><strong>Dream STEM Lead</strong>, UCodeGirl (Remote)<br>
-      <em>Feb 2022 – June 2024</em><br>
-      • Developed a resource website for immigrants in tech.<br>
-      • Improved accessibility and refined resources through analytics.</p>
+      <div class="job">
+        <div class="job-header">
+          <h3>Kikclub</h3>
+          <span class="time">Oct 2024 – Mar 2025</span>
+        </div>
+        <div class="role">Coding Camp Organizer & Program Analytics</div>
+        <ul>
+          <li>Analyzed engagement data from multi-week virtual coding camps.</li>
+          <li>Designed feedback surveys to iteratively improve curriculum effectiveness.</li>
+        </ul>
+      </div>
     </section>
 
-    <section>
-      <h2>Projects</h2>
-      <p><strong>Sports Betting Behavior Analysis</strong> (Dec 2024)<br>
-      • Analyzed impact of real-time odds updates on betting behavior using Pandas, Matplotlib, Seaborn.<br>
-      • Conducted regression, A/B testing, and hypothesis testing.</p>
-
-      <p><strong>Medical Bill Decoder App</strong> (Mar 2025)<br>
-      • Developed iOS app using NLP to decode medical bills.<br>
-      • Enabled personalized cost estimation and explained charges.</p>
-    </section>
-
-    <section>
+    <section class="resume-section">
       <h2>Technical Skills</h2>
-      <ul>
-        <li><strong>Languages:</strong> Java, Python, C/C++, SQL (Postgres), JavaScript, HTML/CSS, R, Stata, Julia</li>
-        <li><strong>Tools:</strong> Git, Docker, TravisCI, GCP, VS Code, Visual Studio, PyCharm, Jupyter Notebook, Jira</li>
-        <li><strong>Libraries:</strong> pandas, NumPy, Matplotlib</li>
+      <ul style="list-style:none; padding:0;">
+        <li style="margin-bottom:0.5rem;"><strong>Languages:</strong> Python, SQL (Postgres), Java, R, JavaScript, HTML/CSS, C/C++, Stata</li>
+        <li style="margin-bottom:0.5rem;"><strong>Analysis & ML:</strong> Regression (Linear/Logistic), Hypothesis Testing, A/B Testing, NLP, Recommender Systems</li>
+        <li><strong>Tools:</strong> Git, Docker, GCP, AWS, Tableau, Power BI, Streamlit, Jupyter</li>
       </ul>
     </section>
   </main>

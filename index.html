@@ -4,37 +4,35 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Kalkidan Berhe Gebrekirstos</title>
-
-  <link rel="stylesheet" href="style.css?v=3">
-  <script type="module" src="global.js?v=2"></script>
+  <link rel="stylesheet" href="style.css?v=2026">
+  <script type="module" src="global.js?v=2026"></script>
 </head>
-
 <body>
-  <header>
-    <h1>Kalkidan Berhe Gebrekirstos</h1>
-    <p>Data Science major at UC San Diego</p>
-  </header>
-
-  <main>
-    <section>
-      <h2>About Me</h2>
-      <p>
-        I’m passionate about exploring data, solving problems, and telling stories with insights. 
-        Outside of school, one of the most exciting things I did this summer was going skydiving 
-        in Oceanside, and if I could, I would do it every day. The breathtaking ocean view 
-        made it an unforgettable experience, and I highly recommend the Oceanside skydive 
-        to anyone looking for adventure.
-      </p>
+  <main class="container">
+    <section class="hero">
+      <div>
+        <h1>Kalkidan Berhe Gebrekirstos</h1>
+        <p class="tagline">Data Science Major at UC San Diego</p>
+        
+        <p style="color:var(--text-muted); max-width:600px;">
+          I transform raw data into actionable narratives. As a Lead Project Manager at Eclipse Analytics 
+          and a Data Science student, I specialize in building ML pipelines, analyzing complex datasets 
+          like NBA player performance and mortgage inequality, and designing intuitive visualizations.
+        </p>
+        
+        <div id="stats" class="stats-grid"></div>
+      </div>
+      
+      <img src="images/me.jpg" alt="Kalkidan Profile">
     </section>
 
-    <img src="images/me.png" alt="Kalkidan skydiving over Oceanside with the Pacific Ocean in the background" width="400" />
-
     <section>
-      <h2>Latest Projects</h2>
-      <div class="projects"></div>
+      <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:1rem;">
+        <h2>Latest Projects</h2>
+        <a href="projects/" style="color:var(--accent); text-decoration:none;">View All →</a>
+      </div>
+      <div id="latest-projects" class="project-grid"></div>
     </section>
-
-    <section id="profile-stats" aria-live="polite"></section>
   </main>
 
   <script type="module" src="index.js"></script>
