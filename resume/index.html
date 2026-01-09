@@ -3,24 +3,23 @@
 <head>
   <meta charset="utf-8" />
   <title>Resume | Kalkidan</title>
-  <link rel="stylesheet" href="../style.css?v=2026">
+  <link rel="stylesheet" href="../style.css?v=resume-fix">
   <script type="module" src="../global.js"></script>
 </head>
 <body>
   <main class="container">
     <div style="text-align:right; margin: 2rem 0;">
-      <a href="KBG26.pdf" target="_blank" class="btn" style="color:var(--accent); font-weight:bold; border:1px solid var(--border); padding:0.5rem 1rem; border-radius:8px; text-decoration:none;">Download PDF</a>
+      <a href="KBG26.pdf" target="_blank" class="btn" style="color:var(--accent); font-weight:bold; border:1px solid var(--glass-border); padding:0.5rem 1rem; border-radius:8px; text-decoration:none;">Download PDF</a>
     </div>
 
     <section class="resume-section">
-      <h2>Education</h2>
+      <h2>Technical Skills</h2>
       <div class="job">
-        <div class="job-header">
-          <h3>University of California, San Diego</h3>
-          <span class="time">Expected June 2026</span>
-        </div>
-        <div class="role">B.S. Data Science, Minor in Economics</div>
-        <p style="color:var(--text-muted); margin-top:0.25rem;">La Jolla, CA</p>
+        <ul style="list-style:none; padding:0; margin:0;">
+          <li style="margin-bottom:0.5rem;"><strong>Languages:</strong> Python, SQL (Postgres), Java, R, JavaScript, HTML/CSS, C/C++, Stata</li>
+          <li style="margin-bottom:0.5rem;"><strong>Analysis & ML:</strong> Regression (Linear/Logistic), Hypothesis Testing, A/B Testing, NLP, Recommender Systems, Supervised Learning</li>
+          <li><strong>Tools:</strong> Git, Docker, GCP, AWS, Tableau, Power BI, Streamlit, Jupyter, VS Code</li>
+        </ul>
       </div>
     </section>
 
@@ -34,9 +33,9 @@
         </div>
         <div class="role">Lead Project Manager, Sports Analytics</div>
         <ul>
-          <li>Lead two analytics teams (6-8 analysts) conducting statistical modeling for basketball and football.</li>
-          <li>Analyze UCSD Women's Basketball practice data using visual tracking and spatial metrics.</li>
-          <li>Design player heat maps and visualizations for shooting efficiency and defensive impact.</li>
+          <li><strong>Spearheaded</strong> two analytics teams (8 analysts) to develop predictive statistical models for basketball and football, driving data-informed coaching strategies.</li>
+          <li><strong>Engineered</strong> spatial metrics and shooting heat maps from UCSD Women's Basketball practice data, identifying key efficiency patterns for training optimization.</li>
+          <li><strong>Oversaw</strong> end-to-end data pipelines and visualization quality, mentoring junior analysts on best practices in Python and Tableau.</li>
         </ul>
       </div>
 
@@ -47,9 +46,9 @@
         </div>
         <div class="role">Data Analytics Extern</div>
         <ul>
-          <li>Performed quantitative analysis on consumer and social media data using Python.</li>
-          <li>Applied NLP-based sentiment analysis to identify trends in product perception.</li>
-          <li>Conducted competitor benchmarking to support product positioning.</li>
+          <li><strong>Executed</strong> quantitative analysis on large-scale consumer and social media datasets using Python to extract actionable market insights.</li>
+          <li><strong>Implemented</strong> NLP sentiment analysis algorithms to quantify brand perception trends, directly supporting strategic product positioning.</li>
+          <li><strong>Delivered</strong> competitor benchmarking reports that influenced key stakeholder decisions on feature prioritization.</li>
         </ul>
       </div>
 
@@ -60,20 +59,60 @@
         </div>
         <div class="role">Coding Camp Organizer & Program Analytics</div>
         <ul>
-          <li>Analyzed engagement data from multi-week virtual coding camps.</li>
-          <li>Designed feedback surveys to iteratively improve curriculum effectiveness.</li>
+          <li><strong>Analyzed</strong> student engagement metrics across multiple virtual cohorts, identifying drop-off points to improve retention.</li>
+          <li><strong>Optimized</strong> curriculum effectiveness by designing and interpreting feedback surveys, resulting in higher student satisfaction scores.</li>
         </ul>
       </div>
     </section>
 
     <section class="resume-section">
-      <h2>Technical Skills</h2>
-      <ul style="list-style:none; padding:0;">
-        <li style="margin-bottom:0.5rem;"><strong>Languages:</strong> Python, SQL (Postgres), Java, R, JavaScript, HTML/CSS, C/C++, Stata</li>
-        <li style="margin-bottom:0.5rem;"><strong>Analysis & ML:</strong> Regression (Linear/Logistic), Hypothesis Testing, A/B Testing, NLP, Recommender Systems</li>
-        <li><strong>Tools:</strong> Git, Docker, GCP, AWS, Tableau, Power BI, Streamlit, Jupyter</li>
-      </ul>
+      <h2>Selected Projects</h2>
+      
+      <div class="job">
+        <div class="job-header">
+          <h3>NBA All-Star Selection Prediction</h3>
+          <span class="time">2025</span>
+        </div>
+        <ul>
+          <li>Developed a supervised ML pipeline predicting All-Star selections with <strong>99% ROC-AUC</strong> using 15,000 player-seasons.</li>
+          <li>Implemented logistic regression from scratch with L2 regularization and mini-batch gradient descent.</li>
+        </ul>
+      </div>
+
+      <div class="job">
+        <div class="job-header">
+          <h3>Mortgage Inequality Explorer</h3>
+          <span class="time">2024</span>
+        </div>
+        <ul>
+          <li>Built an interactive geospatial dashboard analyzing mortgage disparities using <strong>100k+ HMDA records</strong>.</li>
+          <li>Visualized structural inequality across 50+ regions by integrating census data with financial metrics.</li>
+        </ul>
+      </div>
+
+      <div class="job">
+        <div class="job-header">
+          <h3>Sports Betting Behavior Analysis</h3>
+          <span class="time">2025</span>
+        </div>
+        <ul>
+          <li>Analyzed real-time odds movement for <strong>200+ EPL & NFL games</strong> to evaluate market efficiency and risk.</li>
+          <li>Applied regression analysis and A/B-style comparisons to identify profitable betting anomalies.</li>
+        </ul>
+      </div>
     </section>
+
+    <section class="resume-section">
+      <h2>Education</h2>
+      <div class="job">
+        <div class="job-header">
+          <h3>University of California, San Diego</h3>
+          <span class="time">June 2026</span> </div>
+        <div class="role">B.S. Data Science, Minor in Economics</div>
+        <p style="color:var(--text-muted); margin-top:0.25rem;">La Jolla, CA</p>
+      </div>
+    </section>
+
   </main>
 </body>
 </html>
