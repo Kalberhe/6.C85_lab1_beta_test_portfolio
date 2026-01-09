@@ -11,7 +11,7 @@ async function init() {
     if (!container) return;
     
     if (data.length === 0) {
-      container.innerHTML = `<p style="text-align:center; grid-column:1/-1; color:white; font-size:1.2rem;">No projects found matching that!</p>`;
+      container.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-muted)">No matching projects found.</p>`;
       return;
     }
 
@@ -19,10 +19,9 @@ async function init() {
       <article class="card">
         <h3>${p.title}</h3>
         <div class="meta">${p.year}</div>
-        ${p.image ? `<img src="${p.image}" alt="${p.title}" onerror="this.style.display='none'">` : ''}
         <p>${p.description}</p>
-        <div style="margin-top:auto">
-           ${(p.links||[]).map(l => `<a href="${l.href}" target="_blank" style="margin-right:15px">🔗 ${l.label}</a>`).join("")}
+        <div class="links">
+           ${(p.links||[]).map(l => `<a href="${l.href}" target="_blank">🔗 ${l.label}</a>`).join("")}
         </div>
       </article>
     `).join("");
@@ -35,7 +34,6 @@ async function init() {
     render(filtered);
   }
 
-  // Search Listener
   if (input) {
     input.addEventListener("input", e => {
       query = e.target.value;

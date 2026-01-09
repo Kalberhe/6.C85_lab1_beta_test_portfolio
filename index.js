@@ -1,32 +1,48 @@
-// index.js
-import { fetchJSON, renderProjects, fetchGitHubData } from "./global.js?v=2";
+import { fetchJSON } from "./global.js";
 
-async function main() {
+async function init() {
+  const container = document.getElementById("latest-projects");
+  const statsBox = document.getElementById("stats");
 
-  const all = await fetchJSON("./lib/projects.json");
-  const latest = (Array.isArray(all) ? all : [])
-    .slice(0, 3)
-
-    .map(p => ({ ...p, image: p.image?.startsWith("projects/") ? p.image : `projects/${p.image}` }));
-
-  const projContainer = document.querySelector(".projects");
-  if (projContainer) renderProjects(latest, projContainer, "h3");
-
- 
-  const stats = await fetchGitHubData();
-  const box = document.querySelector("#profile-stats");
-  if (box && stats) {
-    box.innerHTML = `
-      <h2>GitHub Snapshot</h2>
-      <dl class="gh-grid">
-        <dt>Repos</dt><dd>${stats.public_repos}</dd>
-        <dt>Gists</dt><dd>${stats.public_gists}</dd>
-        <dt>Followers</dt><dd>${stats.followers}</dd>
-        <dt>Following</dt><dd>${stats.following}</dd>
-      </dl>
-    `;
+  // 1. Fetch Projects
+  try {
+    const projects = await fetchJSON("./lib/projects.json");
+    
+    if (container && Array.isArray(projects) && projects.length > 0) {
+      // Top 3 latest
+      const latest = projects.slice(0, 3);
+      
+      container.innerHTML = latest.map(p => `
+        <article class="card">
+          <h3>${p.title}</h3>
+          <div class="meta">${p.year}</div>
+          <p>${p.description}</p>
+          <div class="links">
+             ${(p.links||[]).map(l => `<a href="${l.href}" target="_blank">${l.label}</a>`).join("")}
+          </div>
+        </article>
+      `).join("");
+    } else if (container) {
+      container.innerHTML = `<p>No projects found.</p>`;
+    }
+  } catch (err) {
+    console.error("Project fetch failed:", err);
+    if(container) container.innerHTML = `<p>Error loading projects.</p>`;
   }
 
-  console.log("Home wired: latest projects + GitHub stats loaded");
+  // 2. Stats
+  try {
+    const stats = await fetchJSON("https://api.github.com/users/Kalberhe");
+    if (statsBox && stats.public_repos) {
+      statsBox.innerHTML = `
+        <div class="stat-box"><dt>Repos</dt><dd>${stats.public_repos}</dd></div>
+        <div class="stat-box"><dt>Followers</dt><dd>${stats.followers}</dd></div>
+        <div class="stat-box"><dt>Gists</dt><dd>${stats.public_gists}</dd></div>
+        <div class="stat-box"><dt>Following</dt><dd>${stats.following}</dd></div>
+      `;
+    }
+  } catch (e) {
+    console.warn("GitHub stats failed", e);
+  }
 }
-main();
+init();

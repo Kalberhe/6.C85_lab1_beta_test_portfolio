@@ -1,31 +1,57 @@
 [
   {
-    "title": "NBA All-Star Selection Prediction",
+    "title": "Mortgage Inequality Explorer",
+    "year": "2024",
+    "description": "Explore U.S. mortgage access and inequality, 2018–2023, with interactive maps and plots. Analyze census tract data (HMDA) by income, race, and neighborhood, integrating FRED rates for macro context.",
+    "links": [
+      {"label": "Live Demo", "href": "https://hoyalim.github.io/mortgage-Inequality-Explorer/interactive_dashboard.html"},
+      {"label": "View Code", "href": "https://github.com/Kalberhe/mortgage-Inequality-Explorer"}
+    ]
+  },
+  {
+    "title": "Bikewatching",
+    "year": "2024",
+    "description": "Interactive visualization tracking bike traffic patterns and infrastructure. Analyzes urban mobility data to highlight usage trends.",
+    "links": [
+      {"label": "Live Demo", "href": "https://kalberhe.github.io/bikewatching/"},
+      {"label": "View Code", "href": "https://github.com/Kalberhe/bikewatching"}
+    ]
+  },
+  {
+    "title": "Persuasive or Deceptive Visualization",
+    "year": "2024",
+    "description": "Advanced data visualization project exploring complex datasets with interactive web-based plotting techniques using D3.js.",
+    "links": [
+      {"label": "Live Demo", "href": "https://kalberhe.github.io/DSC106-Peoject-2/"},
+      {"label": "View Code", "href": "https://github.com/Kalberhe/DSC106-Peoject-2"}
+    ]
+  },
+  {
+    "title": "Comparing Decadal Warming in the Central and Western Equatorial Pacific",
     "year": "2025",
-    "image": "https://via.placeholder.com/600x400?text=NBA+Prediction",
+    "description": "Comprehensive data analysis project utilizing statistical modeling, exploratory data analysis, and hypothesis testing.",
+    "links": [
+      {"label": "Live Demo", "href": "https://kalberhe.github.io/Project3/"},
+      {"label": "View Code", "href": "https://github.com/Kalberhe/Project3"}
+    ]
+  },
+  {
+    "title": "NBA All-Star Prediction",
+    "year": "2025",
     "description": "Supervised ML pipeline predicting NBA All-Star selections with 99% ROC-AUC. Implemented logistic regression from scratch with L2 regularization using 15,000 player-seasons.",
     "links": []
   },
   {
-    "title": "Mortgage Inequality Explorer",
+    "title": "Sports Betting Behavior",
     "year": "2024",
-    "image": "https://via.placeholder.com/600x400?text=Mortgage+Inequality",
-    "description": "Interactive geospatial dashboard analyzing mortgage approval disparities across 50+ U.S. states. Processed 100k+ HMDA/Census records to visualize structural inequality.",
-    "links": []
-  },
-  {
-    "title": "Sports Betting Behavior Analysis",
-    "year": "2025",
-    "image": "projects/sportsbetting.png",
     "description": "Analyzed real-time odds movement (EPL, NFL) vs. betting behavior using live API data. Applied EDA and regression to evaluate risk and payout outcomes.",
     "links": [
       {"label": "View Report", "href": "https://drive.google.com/file/d/1CTdeA6R5j5pBtOlefa-8UVxA5h-k_CQh/view?usp=sharing"}
     ]
   },
   {
-    "title": "Predicting League of Legends Outcomes",
+    "title": "LoL Match Prediction",
     "year": "2024",
-    "image": "projects/lol.png",
     "description": "Logistic regression and gradient boosting on pro match data. Audited for fairness with >95% accuracy and analysis of blue-side bias.",
     "links": [
       {"label": "View Project", "href": "https://kalberhe.github.io/DSC80_FINAL_PROJECT/"},
@@ -33,28 +59,9 @@
     ]
   },
   {
-    "title": "Medical Bill Decoder App",
-    "year": "2025",
-    "image": "projects/Medicalbill.png",
+    "title": "Medical Bill Decoder",
+    "year": "2024",
     "description": "iOS app utilizing NLP to translate medical bills and estimate costs with visual breakdowns of charges.",
     "links": []
-  },
-  {
-    "title": "Netflix Recommendation System",
-    "year": "2023",
-    "image": "",
-    "description": "Collaborative filtering and content-based models to predict movie ratings using the MovieLens dataset."
-  },
-  {
-    "title": "Climate Change Storytelling",
-    "year": "2024",
-    "image": "",
-    "description": "Animated scrollytelling visualization of CO₂ emissions using D3.js, featuring narrative text alignment."
-  },
-  {
-    "title": "Padres Business Analytics",
-    "year": "2024",
-    "image": "",
-    "description": "Analyzed attendance trends and concession sales for the San Diego Padres to recommend pricing strategies."
   }
 ]
